@@ -78,16 +78,23 @@ storiesOf('scroll-event-enhancer', module)
             scrollEndDebounceTime: number;
             wheelEndDebounceTime: number;
         }> = ({ scrollEndDebounceTime, wheelEndDebounceTime }) => {
-            const scrollAnimationEvent = useScrollAnimationEvent({
+            const { event, scrollAnimationEndTrigger } = useScrollAnimationEvent({
                 scrollContainerElement: document,
                 wheelEndDebounceTime: wheelEndDebounceTime,
                 scrollEndDebounceTime: scrollEndDebounceTime,
                 minSpeedY: 0.3,
             });
 
+            const animationEventName = event && event.eventName;
+            React.useEffect(() => {
+                if (animationEventName === 'start') {
+                    setTimeout(scrollAnimationEndTrigger, 1000);
+                }
+            }, [animationEventName, scrollAnimationEndTrigger]);
+
             return (
                 <>
-                    <Log name="scrollAnimationEvent" msg={scrollAnimationEvent} />;
+                    <Log name="scrollAnimationEvent" msg={event} />;
                 </>
             );
         };

@@ -57,16 +57,8 @@ const useScrollAnimationEvent = ({
                 }
             }
         } else if (domScrollEvent.eventName === 'scroll:end') {
-            // first time after move
             if (isEndAnimation === false) {
-                // applied minSpeed
-                if (isStartAnimation === true) {
-                    setIsStartAnimation(false); // TODO: animation end
-                    setIsEndAnimation(true);
-                    setEvent({
-                        eventName: 'end',
-                    });
-                } else {
+                if (isStartAnimation === false) {
                     // without minSpeed
                     setIsStartAnimation(true);
                     setEvent({
@@ -77,7 +69,19 @@ const useScrollAnimationEvent = ({
         }
     }
 
-    return event;
+    const scrollAnimationEndTrigger = React.useCallback(() => {
+        setIsEndAnimation(true);
+        setIsStartAnimation(false);
+
+        setEvent({
+            eventName: 'end',
+        });
+    }, []);
+
+    return {
+        event,
+        scrollAnimationEndTrigger,
+    };
 };
 
 export { useScrollAnimationEvent };
