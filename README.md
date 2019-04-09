@@ -13,6 +13,8 @@
 
 ### eslint react
 `yarn add eslint-plugin-react --dev`
+`yarn add eslint-plugin-react-hooks --dev` // react hooks
 
 ### eslint with prettier
 `yarn add prettier eslint-config-prettier eslint-plugin-prettier --dev`
+

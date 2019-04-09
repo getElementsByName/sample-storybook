@@ -1,9 +1,9 @@
-import * as React from 'react'
+import * as React from 'react';
 
-import { storiesOf } from '@storybook/react'
-import { action } from '@storybook/addon-actions'
-import { linkTo } from '@storybook/addon-links'
-import { text, boolean, number } from '@storybook/addon-knobs'
+import { storiesOf } from '@storybook/react';
+import { action } from '@storybook/addon-actions';
+import { linkTo } from '@storybook/addon-links';
+import { text, boolean, number } from '@storybook/addon-knobs';
 
 storiesOf('Sample', module)
     // Actions
@@ -20,14 +20,14 @@ storiesOf('Sample', module)
     ))
     // Knobs
     .add('addon-knobs', () => {
-        const name = text('Name', 'Arunoda Susiripala')
-        const age = number('Age', 89)
+        const name = text('Name', 'Arunoda Susiripala');
+        const age = number('Age', 89);
 
-        const content = `I am ${name} and I'm ${age} years old.`
+        const content = `I am ${name} and I'm ${age} years old.`;
         return (
             <>
                 <div>{content}</div>{' '}
                 <button disabled={boolean('Disabled', false)}>{text('Label', 'Hello Storybook')}</button>
             </>
-        )
-    })
+        );
+    });
