@@ -36,6 +36,15 @@ const useScrollAnimationEvent = ({
         scrollContainerElement: scrollContainerElement,
     });
 
+    const setStart = React.useCallback(() => {
+        if (isStartAnimation === false) {
+            setIsStartAnimation(true);
+            setEvent({
+                eventName: 'start',
+            });
+        }
+    }, [isStartAnimation]);
+
     if (userScrollTriggerEvent.eventName === 'user-scroll:start') {
         if (isEndAnimation === true) {
             setIsEndAnimation(false);
@@ -49,22 +58,12 @@ const useScrollAnimationEvent = ({
                 (minSpeedY !== undefined && Math.abs(domScrollEvent.speedY) < minSpeedY) ||
                 (minSpeedX !== undefined && Math.abs(domScrollEvent.speedX) < minSpeedX)
             ) {
-                if (isStartAnimation === false) {
-                    setIsStartAnimation(true);
-                    setEvent({
-                        eventName: 'start',
-                    });
-                }
+                setStart();
             }
         } else if (domScrollEvent.eventName === 'scroll:end') {
             if (isEndAnimation === false) {
-                if (isStartAnimation === false) {
-                    // without minSpeed
-                    setIsStartAnimation(true);
-                    setEvent({
-                        eventName: 'start',
-                    });
-                }
+                // without minSpeed
+                setStart();
             }
         }
     }
