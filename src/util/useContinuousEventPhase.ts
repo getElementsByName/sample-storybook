@@ -7,19 +7,30 @@ interface ArgumentsType<T, R> {
     debounceTime: number;
 }
 
+const INIT_STATUS = {
+    isFirst: true,
+    isReady: true,
+    functionArgument: null,
+};
+
 function useContinuousEventPhase<T, R>({ debounceTime }: ArgumentsType<T, R>) {
     interface DebounceCallbackFromStateType {
         // A function argument is special in useState() for merging objects with prev one & new one
         callback: Function;
     }
     const [debounceCallback, setDebounceCallback] = React.useState<null | DebounceCallbackFromStateType>(null);
-    const [isReady, setIsReady] = React.useState<boolean>(true);
-    const [isFirst, setIsFirst] = React.useState<boolean>(true);
+
+    interface StatusType {
+        isReady: boolean;
+        isFirst: boolean;
+        functionArgument: null | T;
+    }
+
+    const [status, setStatus] = React.useState<StatusType>(INIT_STATUS);
 
     React.useEffect(() => {
-        const newDebounceCallback = debounce((args: T) => {
-            setIsReady(true);
-            setIsFirst(true);
+        const newDebounceCallback = debounce(() => {
+            setStatus(prev => ({ ...prev, ...{ isReady: true, isFirst: true } }));
         }, debounceTime);
 
         setDebounceCallback({
@@ -28,6 +39,7 @@ function useContinuousEventPhase<T, R>({ debounceTime }: ArgumentsType<T, R>) {
 
         return () => {
             setDebounceCallback(null);
+            setStatus(INIT_STATUS);
         };
     }, [debounceTime]);
 
@@ -37,28 +49,31 @@ function useContinuousEventPhase<T, R>({ debounceTime }: ArgumentsType<T, R>) {
                 debounceCallback.callback(args);
             }
 
-            if (isReady) {
-                setIsReady(false);
-            }
-
-            if (isReady === false && isFirst) {
-                setIsFirst(false);
+            if (status.isReady) {
+                setStatus(prev => ({ ...prev, ...{ isReady: false, functionArgument: args } }));
+            } else if (status.isFirst) {
+                setStatus(prev => ({ ...prev, ...{ isFirst: false, functionArgument: args } }));
+            } else {
+                setStatus(prev => ({ ...prev, ...{ functionArgument: args } }));
             }
         },
-        [debounceCallback, isReady],
+        [debounceCallback, status],
     );
 
     let phaseName: PhaseName;
-    if (isReady) {
-        phaseName = 'end';
-    } else if (isFirst) {
+    if (status.isReady === false && status.isFirst) {
         phaseName = 'start';
+    } else if (status.isReady && status.isFirst) {
+        phaseName = 'end';
     } else {
         phaseName = 'progress';
     }
 
     return {
+        functionArgument: status.functionArgument,
         triggerCallback,
         phase: phaseName,
     };
 }
+
+export { useContinuousEventPhase };

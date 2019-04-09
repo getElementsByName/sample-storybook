@@ -2,6 +2,7 @@ import * as React from 'react';
 import { ScrollContainerElementType } from '../domScrollEvent/ScrollEvent';
 import { UserScrollTriggerEvent, UserScrollTriggerEventType } from './UserScrollTriggerEvent';
 import { useDOMEventHandler } from '../../util/useDOMEventHandler';
+import { useContinuousEventPhase } from '../../util/useContinuousEventPhase';
 import { debounce } from '../../util/debounce';
 
 const eventNameMappingTable = {
@@ -54,38 +55,34 @@ const useUserScrollTriggerEventWatcher = ({ scrollContainerElement, wheelEndDebo
     useEventHandler(scrollContainerElement, 'touchcancel', setEvent);
 
     // wheel: start | move
-    useEventHandler(scrollContainerElement, 'mousewheel', setEvent); // IE9, Chrome, Safari, Opera
+    const wheelEventPhase = useContinuousEventPhase<WheelEvent, void>({
+        debounceTime: wheelEndDebounceTime,
+    });
 
-    useEventHandler(scrollContainerElement, 'DOMMouseScroll', setEvent); // Firefox
-
-    // wheel debounce: end
-    type DebounceScrollEndHandlerType = (event: WheelEvent) => void;
-
-    interface DebounceCallbackFromStateType {
-        // A function argument is special in useState() for merging objects with prev one & new one
-        callback: DebounceScrollEndHandlerType;
-    }
-    const [scrollEndFromWheel, setScrollEndFromWheel] = React.useState<null | DebounceCallbackFromStateType>(null);
+    const wheelPhase = wheelEventPhase.phase;
+    const wheelEvent = wheelEventPhase.functionArgument;
 
     React.useEffect(() => {
-        const newDebounceCallback = debounce((event: WheelEvent) => {
+        if (wheelPhase === 'start') {
+            setEvent({
+                eventName: 'user-scroll:start',
+                originalEvent: wheelEvent,
+            });
+        } else if (wheelPhase === 'progress') {
+            setEvent({
+                eventName: 'user-scroll:move',
+                originalEvent: wheelEvent,
+            });
+        } else {
             setEvent({
                 eventName: 'user-scroll:end',
-                originalEvent: event,
+                originalEvent: wheelEvent,
             });
-        }, wheelEndDebounceTime);
+        }
+    }, [wheelPhase, wheelEvent]);
 
-        setScrollEndFromWheel({
-            callback: newDebounceCallback,
-        });
-
-        return () => {
-            setScrollEndFromWheel(null);
-        };
-    }, [wheelEndDebounceTime]);
-
-    useDOMEventHandler(scrollContainerElement, 'mousewheel', scrollEndFromWheel && scrollEndFromWheel.callback);
-    useDOMEventHandler(scrollContainerElement, 'DOMMouseScroll', scrollEndFromWheel && scrollEndFromWheel.callback);
+    useDOMEventHandler(scrollContainerElement, 'mousewheel', wheelEventPhase.triggerCallback); // IE9, Chrome, Safari, Opera
+    useDOMEventHandler(scrollContainerElement, 'DOMMouseScroll', wheelEventPhase.triggerCallback); // Firefox
 
     return event;
 };

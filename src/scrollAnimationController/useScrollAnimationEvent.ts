@@ -5,6 +5,7 @@ import {
     ScrollContainerElementType,
 } from '../eventManager/domScrollEvent/useDOMScrollEventWatcher';
 import { useUserScrollTriggerEventWatcher } from '../eventManager/userScrollTriggerEvent/useUserScrollTriggerEventWatcher';
+import { useContinuousEventPhase } from '../util/useContinuousEventPhase';
 
 interface ArgumentsType {
     scrollContainerElement: ScrollContainerElementType;

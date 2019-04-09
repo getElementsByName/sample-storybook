@@ -5,13 +5,16 @@
 
 
 
-
+### TODO
 - useContinuousEventPhase
-  - wheel start
   - animation start / progress
 
 
 
 
-
+### DOEN
 - useDebounce -> sample
+- useContinuousEventPhase
+  - user trigger
+    - wheel + touch
+    - wheel start

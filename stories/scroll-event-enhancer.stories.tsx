@@ -14,6 +14,14 @@ import { number } from '@storybook/addon-knobs';
 const DEFAULT_DEBOUNCE_TIME_MS = 300;
 const DEFAULT_WHEEL_DEBOUNCE_TIME_MS = 1000;
 
+// prevent duplicated call log (call log only when props are changed)
+const Log: React.FC<{ name?: string; msg: any }> = ({ name, msg }) => {
+    React.useEffect(() => {
+        console.log(name, msg);
+    }, [name, msg]);
+    return null;
+};
+
 const ScrollElement: React.FC = () => {
     return (
         <div>
@@ -44,10 +52,12 @@ storiesOf('scroll-event-enhancer', module)
                 scrollContainerElement: document,
             });
 
-            console.log('userScrollTriggerEvent', userScrollTriggerEvent);
-            console.log('domScrollEvent', domScrollEvent);
-
-            return null;
+            return (
+                <>
+                    <Log name="userScrollTriggerEvent" msg={userScrollTriggerEvent} />;
+                    <Log name="domScrollEvent" msg={domScrollEvent} />;
+                </>
+            );
         };
 
         return (
