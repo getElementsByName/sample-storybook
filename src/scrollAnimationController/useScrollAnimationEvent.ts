@@ -24,7 +24,7 @@ const useScrollAnimationEvent = ({
 }: ArgumentsType) => {
     const [event, setEvent] = React.useState<ScrollAnimationEvent | null>(null);
     const [isStartAnimation, setIsStartAnimation] = React.useState<boolean>(false);
-    const [isEndAnimation, setIsEndAnimation] = React.useState<boolean>(true);
+    const [isEndAnimation, setIsEndAnimation] = React.useState<boolean>(false);
 
     const userScrollTriggerEvent = useUserScrollTriggerEventWatcher({
         scrollContainerElement: scrollContainerElement,
@@ -36,15 +36,24 @@ const useScrollAnimationEvent = ({
         scrollContainerElement: scrollContainerElement,
     });
 
-    // after user event end
-    if (userScrollTriggerEvent.eventName === 'user-scroll:end') {
+    if (userScrollTriggerEvent.eventName === 'user-scroll:start') {
+        if (isEndAnimation === true) {
+            setIsEndAnimation(false);
+        }
+    } else if (userScrollTriggerEvent.eventName === 'user-scroll:end') {
+        // after user event end
         if (domScrollEvent.eventName === 'scroll:move') {
+            // console.log('domScrollEvent.speedY', Math.abs(domScrollEvent.speedY));
+
             if (
-                (minSpeedY !== undefined && domScrollEvent.scrollY < minSpeedY) ||
-                (minSpeedX !== undefined && domScrollEvent.scrollX < minSpeedX)
+                (minSpeedY !== undefined && Math.abs(domScrollEvent.speedY) < minSpeedY) ||
+                (minSpeedX !== undefined && Math.abs(domScrollEvent.speedX) < minSpeedX)
             ) {
                 if (isStartAnimation === false) {
                     setIsStartAnimation(true);
+                    setEvent({
+                        eventName: 'start',
+                    });
                 }
             }
         } else if (domScrollEvent.eventName === 'scroll:end') {
@@ -53,25 +62,22 @@ const useScrollAnimationEvent = ({
                 // applied minSpeed
                 if (isStartAnimation === true) {
                     setIsStartAnimation(false); // TODO: animation end
+                    setIsEndAnimation(true);
+                    setEvent({
+                        eventName: 'end',
+                    });
                 } else {
                     // without minSpeed
                     setIsStartAnimation(true);
+                    setEvent({
+                        eventName: 'start',
+                    });
                 }
-
-                setIsEndAnimation(true); // TODO: animation end
             }
         }
     }
 
-    if (isStartAnimation) {
-        return {
-            eventName: 'start',
-        };
-    }
-
-    return {
-        eventName: 'end',
-    };
+    return event;
 };
 
 export { useScrollAnimationEvent };

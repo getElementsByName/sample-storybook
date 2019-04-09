@@ -82,11 +82,14 @@ storiesOf('scroll-event-enhancer', module)
                 scrollContainerElement: document,
                 wheelEndDebounceTime: wheelEndDebounceTime,
                 scrollEndDebounceTime: scrollEndDebounceTime,
+                minSpeedY: 0.3,
             });
 
-            console.log('scrollAnimationEvent', scrollAnimationEvent);
-
-            return null;
+            return (
+                <>
+                    <Log name="scrollAnimationEvent" msg={scrollAnimationEvent} />;
+                </>
+            );
         };
 
         return (
