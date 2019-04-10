@@ -7,7 +7,8 @@ import {
     UserScrollTriggerEvent,
     useScrollAnimationEvent,
     smoothScroll,
-    getRangeInfo,
+    getPointIndex,
+    getClosestPointIndex,
 } from '../';
 
 import { storiesOf } from '@storybook/react';
@@ -24,26 +25,16 @@ const Log: React.FC<{ name?: string; msg: any }> = ({ name, msg }) => {
     return null;
 };
 
-const ScrollElement: React.FC = () => {
+const ScrollElement: React.FC<{ elementLength?: number }> = ({ elementLength = 20 }) => {
+    const elementList = [];
+
+    for (let i = 0; i < elementLength; i++) {
+        elementList.push(<div key={i}>{i}</div>);
+    }
     return (
         <div>
-            <div style={{ width: '100%', height: '1000px', fontSize: '200px' }}>
-                <div>1</div>
-                <div>1</div>
-                <div>1</div>
-                <div>1</div>
-                <div>1</div>
-                <div>1</div>
-                <div>1</div>
-                <div>1</div>
-                <div>1</div>
-                <div>1</div>
-                <div>1</div>
-                <div>1</div>
-            </div>
-            <div style={{ width: '100%', height: '1000px' }}>BOX</div>
-            <div style={{ width: '100%', height: '1000px' }}>BOX</div>
-            <div style={{ width: '100%', height: '1000px' }}>BOX</div>
+            <div style={{ width: '100%', fontSize: '200px' }}>{elementList}</div>
+            <div style={{ width: '100%' }}>END</div>
         </div>
     );
 };
@@ -69,8 +60,8 @@ storiesOf('scroll-event-enhancer', module)
 
             return (
                 <>
-                    <Log name="userScrollTriggerEvent" msg={userScrollTriggerEvent} />;
-                    <Log name="domScrollEvent" msg={domScrollEvent} />;
+                    <Log name="userScrollTriggerEvent" msg={userScrollTriggerEvent} />
+                    <Log name="domScrollEvent" msg={domScrollEvent} />
                 </>
             );
         };
@@ -116,46 +107,47 @@ storiesOf('scroll-event-enhancer', module)
             const animationEventName = event && event.eventName;
             React.useEffect(() => {
                 if (animationEventName === 'start') {
-                    // 0 ~ 200
-                    const topArea = {
-                        entryMin: 0,
-                        entryMax: 150,
-                        max: 200,
-                        min: 0,
-                    };
-
-                    // 201 ~ 400
-                    const middleArea = {
-                        entryMin: 100,
-                        entryMax: 450,
-                        min: 201,
-                        max: 400,
-                    };
-
-                    // 400 ~
-                    const bottomArea = {
-                        entryMin: 350,
-                        min: 401,
-                    };
-
                     if (userScrollStartPosition && scrollAnimationStartPosition) {
-                        const rangeInfo = getRangeInfo({
-                            rangeList: [topArea, middleArea, bottomArea],
-                            startPosition: userScrollStartPosition.y,
-                            endPosition: scrollAnimationStartPosition.y,
+                        const snapPointList = [0, 500, 1000];
+                        const outOffset = 50;
+
+                        const startIndex = getPointIndex({
+                            checkPoint: userScrollStartPosition.y,
+                            offset: 5,
+                            pointList: snapPointList,
                         });
 
-                        // console.log('rangeInfo', rangeInfo);
+                        const { minIndex: endIndex, minDelta: targetDelta } = getClosestPointIndex({
+                            checkPoint: scrollAnimationStartPosition.y,
+                            pointList: snapPointList,
+                        });
 
-                        if (rangeInfo) {
-                            const entryPosition = rangeInfo.entryRange.min;
+                        let nextIndex: number | null = endIndex;
+                        const lastIndex = snapPointList.length - 1;
+
+                        // 마지막 요소에서 움직이는 경우
+                        if (lastIndex === nextIndex && targetDelta && targetDelta > 0) {
+                            nextIndex = null;
+                        } else if (
+                            // 같은 영역에서 offset을 초과한 경우
+                            startIndex !== null &&
+                            endIndex !== null &&
+                            startIndex === endIndex &&
+                            targetDelta !== null &&
+                            Math.abs(targetDelta) > Math.abs(outOffset)
+                        ) {
+                            nextIndex = targetDelta > 0 ? endIndex + 1 : endIndex - 1;
+                        }
+
+                        if (nextIndex !== null) {
+                            const entryPosition = snapPointList[nextIndex];
 
                             const { cancel } = smoothScroll({
                                 scrollContainerElement: document.documentElement,
                                 end: {
                                     y: entryPosition,
                                 },
-                                scrollTime: 1000,
+                                scrollTime: 300,
                                 callback: scrollAnimationEndTrigger,
                             });
 
@@ -170,7 +162,7 @@ storiesOf('scroll-event-enhancer', module)
 
             return (
                 <>
-                    <Log name="scrollAnimationEvent" msg={event} />;
+                    <Log name="scrollAnimationEvent" msg={event} />
                 </>
             );
         };

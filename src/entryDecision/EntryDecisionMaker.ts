@@ -1,93 +1,56 @@
-interface ElementRange {
-    min?: number;
-    max?: number;
+interface GetPointIndexArgumentType {
+    pointList: number[];
+    checkPoint: number;
+    offset?: number;
 }
 
-interface EntryRange {
-    entryMin?: number;
-    entryMax?: number;
-}
+function getPointIndex({ checkPoint, pointList, offset = 5 }: GetPointIndexArgumentType) {
+    for (let i = 0; i < pointList.length; i++) {
+        // TODO: 리스트가 오름차순이면 최적화 가능
+        const nowPoint = pointList[i];
 
-interface RangeInfo extends ElementRange, EntryRange {}
+        const delta = Math.abs(checkPoint - nowPoint);
 
-interface ArgumentsType {
-    rangeList: RangeInfo[];
-    startPosition: number;
-    endPosition: number;
-}
-
-function isInPosition(range: ElementRange, position: number) {
-    if (range.min !== undefined) {
-        if (range.max !== undefined) {
-            return range.max >= position && range.min <= position;
-        } else {
-            return range.min <= position;
-        }
-    } else {
-        if (range.max !== undefined) {
-            return range.max >= position;
-        } else {
-            throw Error(`the min and max of range are both undefined (${range})`);
-        }
-    }
-}
-
-function isEntryPosition(range: EntryRange, position: number) {
-    return isInPosition(
-        {
-            min: range.entryMin,
-            max: range.entryMax,
-        },
-        position,
-    );
-}
-
-function getStartRangeIndex(rangeList: ElementRange[], startPosition: number) {
-    for (let i = 0; i < rangeList.length; i++) {
-        const elementRange = rangeList[i];
-
-        if (isInPosition(elementRange, startPosition)) {
+        if (delta <= offset) {
             return i;
         }
     }
 
     return null;
 }
-function getEntryRangeIndex(rangeList: EntryRange[], endPosition: number, startRangeIndex: number) {
-    for (let i = 0; i < rangeList.length; i++) {
-        if (i !== startRangeIndex) {
-            const entryRange = rangeList[i];
 
-            if (isEntryPosition(entryRange, endPosition)) {
-                return i;
-            }
+interface GetClosestPointIndexArgumentType {
+    pointList: number[];
+    checkPoint: number;
+}
+
+function getClosestPointIndex({ checkPoint, pointList }: GetClosestPointIndexArgumentType) {
+    const deltaList = [];
+
+    for (let i = 0; i < pointList.length; i++) {
+        // TODO: 리스트가 오름차순이면 최적화 가능
+        const nowPoint = pointList[i];
+
+        const delta = checkPoint - nowPoint;
+
+        deltaList.push(delta);
+    }
+
+    let minDelta: number | null = null;
+    let minIndex: number | null = null;
+    for (let i = 0; i < deltaList.length; i++) {
+        const nowDelta = deltaList[i];
+
+        if (minDelta === null || Math.abs(nowDelta) < Math.abs(minDelta)) {
+            minDelta = nowDelta;
+            minIndex = i;
         }
     }
 
-    return null;
-}
-
-function getRangeInfo({ rangeList, startPosition, endPosition }: ArgumentsType) {
-    const startRangeIndex = getStartRangeIndex(rangeList, startPosition);
-
-    if (startRangeIndex === null) {
-        console.warn("can't not find start range");
-        return null;
-    }
-
-    const entryRangeIndex = getEntryRangeIndex(rangeList, endPosition, startRangeIndex);
-
-    if (entryRangeIndex === null) {
-        // console.warn("can't not find entry range");  // same position
-        return null;
-    }
-
     return {
-        startRangeIndex,
-        entryRangeIndex,
-        startRange: rangeList[startRangeIndex],
-        entryRange: rangeList[entryRangeIndex],
+        minIndex,
+        minDelta,
     };
 }
 
-export { getRangeInfo };
+export { getPointIndex, getClosestPointIndex };
