@@ -11,6 +11,7 @@ import {
     getClosestPointIndex,
     getLastFreeScrollSnapAnimationInfo,
     getScrollPosition,
+    useLastFreeScrollSnapAnimation,
 } from '../';
 
 import { storiesOf } from '@storybook/react';
@@ -82,6 +83,7 @@ storiesOf('scroll-event-enhancer', module)
         const snapPointList = [0, 500, 1000];
         const outOffset = 50;
 
+        const scrollAnimationDuration = number('scrollAnimationDuration', 500);
         const scrollEndDebounceTime = number('scrollEndDebounceTime', DEFAULT_DEBOUNCE_TIME_MS);
         const wheelEndDebounceTime = number('wheelEndDebounceTime', DEFAULT_WHEEL_DEBOUNCE_TIME_MS);
 
@@ -89,109 +91,17 @@ storiesOf('scroll-event-enhancer', module)
             scrollEndDebounceTime: number;
             wheelEndDebounceTime: number;
         }> = ({ scrollEndDebounceTime, wheelEndDebounceTime }) => {
-            const cancelCallbackRef = React.useRef<Function | null>(null);
-
-            const {
-                event,
-                scrollAnimationEndTrigger,
-                userScrollStartPosition,
-                scrollAnimationStartPosition,
-                scrollAnimationEndPosition,
-                domScrollEvent,
-                userScrollTriggerEvent,
-            } = useScrollAnimationEvent({
+            const { animationEvent } = useLastFreeScrollSnapAnimation({
                 scrollContainerElement: document,
-                wheelEndDebounceTime: wheelEndDebounceTime,
+                animationDurationMs: scrollAnimationDuration,
+                snapPointList,
+                animationTriggerMinSpeedY: 0.3,
                 scrollEndDebounceTime: scrollEndDebounceTime,
-                minSpeedY: 0.2,
-                cancelCallbackRef,
+                wheelEndDebounceTime: wheelEndDebounceTime,
             });
-
-            // console.log('userScrollStartPosition', userScrollStartPosition);
-            // console.log('scrollAnimationStartPosition', scrollAnimationStartPosition);
-            // console.log('scrollAnimationEndPosition', scrollAnimationEndPosition);
-
-            const animationEventName = event && event.eventName;
-
-            React.useEffect(() => {
-                if (
-                    domScrollEvent.eventName === 'scroll:end' &&
-                    userScrollTriggerEvent.eventName === 'user-scroll:end'
-                ) {
-                    if (userScrollStartPosition && scrollAnimationStartPosition) {
-                        // TODO: from last area && now in last before area ->  animation closest area
-                        const { minIndex: startAreaIndex } = getClosestPointIndex({
-                            pointList: snapPointList,
-                            checkPoint: userScrollStartPosition.y,
-                        });
-                        const lastSnapListIndex = snapPointList.length;
-                        if (startAreaIndex === lastSnapListIndex - 1) {
-                            const nowPosition = getScrollPosition(document);
-                            if (nowPosition.y < snapPointList[lastSnapListIndex]) {
-                                const { minIndex: targetAreaIndex } = getClosestPointIndex({
-                                    pointList: snapPointList,
-                                    checkPoint: nowPosition.y,
-                                });
-
-                                if (targetAreaIndex !== null) {
-                                    const { cancel } = smoothScroll({
-                                        scrollContainerElement: window,
-                                        end: {
-                                            y: snapPointList[targetAreaIndex],
-                                        },
-                                        scrollTime: 500,
-                                        callback: scrollAnimationEndTrigger,
-                                    });
-
-                                    cancelCallbackRef.current = cancel;
-
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                }
-            }, [
-                domScrollEvent.eventName,
-                scrollAnimationEndTrigger,
-                scrollAnimationStartPosition,
-                userScrollStartPosition,
-                userScrollTriggerEvent.eventName,
-            ]);
-
-            React.useEffect(() => {
-                if (animationEventName === 'start') {
-                    if (userScrollStartPosition && scrollAnimationStartPosition) {
-                        const animationInfo = getLastFreeScrollSnapAnimationInfo({
-                            endPosition: scrollAnimationStartPosition.y,
-                            startPosition: userScrollStartPosition.y,
-                            outOffset: 50,
-                            startOffset: 10,
-                            snapPointList: snapPointList,
-                        });
-
-                        if (animationInfo !== null) {
-                            const { cancel } = smoothScroll({
-                                scrollContainerElement: window,
-                                end: {
-                                    y: animationInfo.animationTargetPosition,
-                                },
-                                scrollTime: 500,
-                                callback: scrollAnimationEndTrigger,
-                            });
-
-                            cancelCallbackRef.current = cancel;
-
-                            return;
-                        }
-                    }
-                    scrollAnimationEndTrigger();
-                }
-            }, [animationEventName, scrollAnimationEndTrigger, scrollAnimationStartPosition, userScrollStartPosition]);
-
             return (
                 <>
-                    <Log name="scrollAnimationEvent" msg={event} />
+                    <Log name="scrollAnimationEvent" msg={animationEvent} />
                 </>
             );
         };
