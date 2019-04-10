@@ -6,7 +6,7 @@ import { storiesOf } from '@storybook/react';
 import { number } from '@storybook/addon-knobs';
 
 const DEFAULT_DEBOUNCE_TIME_MS = 300;
-const DEFAULT_WHEEL_DEBOUNCE_TIME_MS = 1000;
+const DEFAULT_WHEEL_DEBOUNCE_TIME_MS = 500;
 
 // prevent duplicated call log (call log only when props are changed)
 const Log: React.FC<{ name?: string; msg: any }> = ({ name, msg }) => {
@@ -97,7 +97,17 @@ storiesOf('scroll-event-enhancer', module)
 
         for (let i = 0; i < snapPointList.length; i++) {
             elementList.push(
-                <div key={i} style={{ top: `${snapPointList[i]}px`, position: 'absolute', height: 1000 }}>
+                <div
+                    key={i}
+                    style={{
+                        top: `${snapPointList[i]}px`,
+                        position: 'absolute',
+                        height: 1000,
+                        width: '50%',
+                        background:
+                            'linear-gradient(0deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(0,212,255,1) 100%)',
+                    }}
+                >
                     {i}
                 </div>,
             );
