@@ -1,5 +1,3 @@
-export type ScrollContainerElementType = Element | Document;
-
 type ScrollStartEventName = 'scroll:start';
 type ScrollMoveEventName = 'scroll:move';
 type ScrollEndEventName = 'scroll:end';

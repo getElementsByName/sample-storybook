@@ -7,6 +7,7 @@ import {
     UserScrollTriggerEvent,
     useScrollAnimationEvent,
     smoothScroll,
+    getRangeInfo,
 } from '../';
 
 import { storiesOf } from '@storybook/react';
@@ -26,7 +27,7 @@ const Log: React.FC<{ name?: string; msg: any }> = ({ name, msg }) => {
 const ScrollElement: React.FC = () => {
     return (
         <div>
-            <div style={{ width: '100%', height: '1000px' }}>
+            <div style={{ width: '100%', height: '1000px', fontSize: '200px' }}>
                 <div>1</div>
                 <div>1</div>
                 <div>1</div>
@@ -94,7 +95,13 @@ storiesOf('scroll-event-enhancer', module)
         }> = ({ scrollEndDebounceTime, wheelEndDebounceTime }) => {
             const cancelCallbackRef = React.useRef<Function | null>(null);
 
-            const { event, scrollAnimationEndTrigger } = useScrollAnimationEvent({
+            const {
+                event,
+                scrollAnimationEndTrigger,
+                userScrollStartPosition,
+                scrollAnimationStartPosition,
+                scrollAnimationEndPosition,
+            } = useScrollAnimationEvent({
                 scrollContainerElement: document,
                 wheelEndDebounceTime: wheelEndDebounceTime,
                 scrollEndDebounceTime: scrollEndDebounceTime,
@@ -102,19 +109,62 @@ storiesOf('scroll-event-enhancer', module)
                 cancelCallbackRef,
             });
 
+            // console.log('userScrollStartPosition', userScrollStartPosition);
+            // console.log('scrollAnimationStartPosition', scrollAnimationStartPosition);
+            // console.log('scrollAnimationEndPosition', scrollAnimationEndPosition);
+
             const animationEventName = event && event.eventName;
             React.useEffect(() => {
                 if (animationEventName === 'start') {
-                    const { cancel } = smoothScroll({
-                        scrollContainerElement: document.documentElement,
-                        end: {
-                            y: 0,
-                        },
-                        scrollTime: 1000,
-                        callback: scrollAnimationEndTrigger,
-                    });
+                    // 0 ~ 200
+                    const topArea = {
+                        entryMin: 0,
+                        entryMax: 150,
+                        max: 200,
+                        min: 0,
+                    };
 
-                    cancelCallbackRef.current = cancel;
+                    // 201 ~ 400
+                    const middleArea = {
+                        entryMin: 100,
+                        entryMax: 450,
+                        min: 201,
+                        max: 400,
+                    };
+
+                    // 400 ~
+                    const bottomArea = {
+                        entryMin: 350,
+                        min: 401,
+                    };
+
+                    if (userScrollStartPosition && scrollAnimationStartPosition) {
+                        const rangeInfo = getRangeInfo({
+                            rangeList: [topArea, middleArea, bottomArea],
+                            startPosition: userScrollStartPosition.y,
+                            endPosition: scrollAnimationStartPosition.y,
+                        });
+
+                        // console.log('rangeInfo', rangeInfo);
+
+                        if (rangeInfo) {
+                            const entryPosition = rangeInfo.entryRange.min;
+
+                            const { cancel } = smoothScroll({
+                                scrollContainerElement: document.documentElement,
+                                end: {
+                                    y: entryPosition,
+                                },
+                                scrollTime: 1000,
+                                callback: scrollAnimationEndTrigger,
+                            });
+
+                            cancelCallbackRef.current = cancel;
+
+                            return;
+                        }
+                    }
+                    scrollAnimationEndTrigger();
                 }
             }, [animationEventName, scrollAnimationEndTrigger]);
 
@@ -135,6 +185,7 @@ storiesOf('scroll-event-enhancer', module)
             </>
         );
     })
+
     .add('basic - container element', () => {
         return (
             <>

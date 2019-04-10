@@ -1,11 +1,8 @@
 import * as React from 'react';
 import { ScrollAnimationEvent } from './ScrollAnimationEvent';
-import {
-    useDOMScrollEventWatcher,
-    ScrollContainerElementType,
-} from '../eventManager/domScrollEvent/useDOMScrollEventWatcher';
-import { useUserScrollTriggerEventWatcher } from '../eventManager/userScrollTriggerEvent/useUserScrollTriggerEventWatcher';
-import { useContinuousEventPhase } from '../util/useContinuousEventPhase';
+import { useDOMScrollEventWatcher, ScrollContainerElementType } from '../domScrollEvent/useDOMScrollEventWatcher';
+import { useUserScrollTriggerEventWatcher } from '../userScrollTriggerEvent/useUserScrollTriggerEventWatcher';
+import { PositionXY, getScrollPosition } from '../../util/getScrollPosition';
 
 interface ArgumentsType {
     scrollContainerElement: ScrollContainerElementType;
@@ -28,6 +25,9 @@ const useScrollAnimationEvent = ({
     const [isStartAnimation, setIsStartAnimation] = React.useState<boolean>(false);
     const [isEndAnimation, setIsEndAnimation] = React.useState<boolean>(false);
     const [isReady, setReady] = React.useState<boolean>(false);
+    const [userScrollStartPosition, setUserScrollStartPosition] = React.useState<PositionXY | null>(null);
+    const [scrollAnimationStartPosition, setScrollAnimationStartPosition] = React.useState<PositionXY | null>(null);
+    const [scrollAnimationEndPosition, setScrollAnimationEndPosition] = React.useState<PositionXY | null>(null);
 
     const userScrollTriggerEvent = useUserScrollTriggerEventWatcher({
         scrollContainerElement: scrollContainerElement,
@@ -45,8 +45,9 @@ const useScrollAnimationEvent = ({
             setEvent({
                 eventName: 'start',
             });
+            setScrollAnimationStartPosition(getScrollPosition(scrollContainerElement));
         }
-    }, [isStartAnimation]);
+    }, [isStartAnimation, scrollContainerElement]);
 
     const scrollAnimationEndTrigger = React.useCallback(() => {
         setIsEndAnimation(true);
@@ -56,11 +57,13 @@ const useScrollAnimationEvent = ({
         setEvent({
             eventName: 'end',
         });
+        setScrollAnimationEndPosition(getScrollPosition(scrollContainerElement));
     }, []);
 
     if (userScrollTriggerEvent.eventName === 'user-scroll:start') {
         if (isReady !== true) {
             setReady(true);
+            setUserScrollStartPosition(getScrollPosition(scrollContainerElement));
         }
 
         if (isEndAnimation === true) {
@@ -68,10 +71,10 @@ const useScrollAnimationEvent = ({
         }
 
         if (isStartAnimation == true && isEndAnimation === false) {
-            cancelCallbackRef && cancelCallbackRef.current && cancelCallbackRef.current();
+            cancelCallbackRef && cancelCallbackRef.current && cancelCallbackRef.current(); // TODO: once
             scrollAnimationEndTrigger();
         }
-    } else if (isReady && userScrollTriggerEvent.eventName === 'user-scroll:end') {
+    } else if (isReady && isEndAnimation === false && userScrollTriggerEvent.eventName === 'user-scroll:end') {
         // after user event end
         if (domScrollEvent.eventName === 'scroll:move') {
             // console.log('domScrollEvent.speedY', Math.abs(domScrollEvent.speedY));
@@ -84,15 +87,16 @@ const useScrollAnimationEvent = ({
             }
         } else if (domScrollEvent.eventName === 'scroll:end') {
             // without minSpeed
-            if (isEndAnimation === false) {
-                setStart();
-            }
+            setStart();
         }
     }
 
     return {
         event,
         scrollAnimationEndTrigger,
+        userScrollStartPosition,
+        scrollAnimationStartPosition,
+        scrollAnimationEndPosition,
     };
 };
 

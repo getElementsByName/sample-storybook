@@ -1,32 +1,8 @@
 import * as React from 'react';
 import { useDOMEventHandler } from '../../util/useDOMEventHandler';
-import {
-    ScrollContainerElementType,
-    ScrollEvent,
-    ScrollStartEvent,
-    ScrollMoveEvent,
-    // ScrollEndEvent,
-} from './ScrollEvent';
+import { ScrollEvent, ScrollStartEvent, ScrollMoveEvent } from './ScrollEvent';
+import { getScrollPosition, ScrollContainerElementType, PositionXY } from '../../util/getScrollPosition';
 import { debounce } from '../../util/debounce';
-
-interface Position {
-    y: number;
-    x: number;
-}
-
-const getScrollPosition = (element: ScrollContainerElementType): Position => {
-    if (element === document) {
-        return {
-            y: window.scrollY,
-            x: window.scrollX,
-        };
-    }
-
-    return {
-        y: (element as Element).scrollTop,
-        x: (element as Element).scrollLeft,
-    };
-};
 
 interface ArgumentsType {
     scrollContainerElement: ScrollContainerElementType;
@@ -40,7 +16,7 @@ const useDOMScrollEventWatcher = ({ scrollContainerElement, debounceTime = 300 }
     });
 
     const latestScrollTimeRef = React.useRef<number | null>(null);
-    const positionRef = React.useRef<Position>(getScrollPosition(scrollContainerElement));
+    const positionRef = React.useRef<PositionXY>(getScrollPosition(scrollContainerElement));
 
     // start, move
     const scrollHandler = React.useCallback(

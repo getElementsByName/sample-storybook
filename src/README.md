@@ -1,20 +1,13 @@
-- user trigger start
-- user trigger end
-
-  - scroll move || scroll end
+### flow
+- DOM / user scroll event --(scroll end -> animation start)--> in/out decision --(in/out change)--> scroll animation
 
 
-
-### TODO
-- useContinuousEventPhase
-  - animation start / progress
-
-
-
-
-### DOEN
+### DONE
 - useDebounce -> sample
 - useContinuousEventPhase
   - user trigger
     - wheel + touch
     - wheel start
+- useContinuousEventPhase
+  - animation start / progress
+

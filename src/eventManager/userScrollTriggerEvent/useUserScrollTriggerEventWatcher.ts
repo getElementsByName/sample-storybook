@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ScrollContainerElementType } from '../domScrollEvent/ScrollEvent';
+import { ScrollContainerElementType } from '../../util/getScrollPosition';
 import { UserScrollTriggerEvent, UserScrollTriggerEventType } from './UserScrollTriggerEvent';
 import { useDOMEventHandler } from '../../util/useDOMEventHandler';
 import { useContinuousEventPhase } from '../../util/useContinuousEventPhase';
