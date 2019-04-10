@@ -55,6 +55,7 @@ function smoothScroll({ callback, scrollContainerElement, end, scrollTime }: Arg
     const duration = isEdge() ? 0 : scrollTime;
     let startTime: number | null = null;
 
+    let scheduleId: number | null = null;
     // setup the stepping function
     function step(timestamp: number) {
         // console.log('animation step');
@@ -82,8 +83,9 @@ function smoothScroll({ callback, scrollContainerElement, end, scrollTime }: Arg
 
         // check if we are over due;
         if (elapsed < duration) {
-            requestAnimationFrameForAllBrowser(step);
+            scheduleId = requestAnimationFrameForAllBrowser(step);
         } else {
+            scheduleId = null;
             // console.log('animation end');
             // console.log('animation callback', callback);
             if (typeof callback === 'function') {
@@ -94,11 +96,16 @@ function smoothScroll({ callback, scrollContainerElement, end, scrollTime }: Arg
             }
         }
     }
-    const scheduleId = requestAnimationFrameForAllBrowser(step);
+    scheduleId = requestAnimationFrameForAllBrowser(step);
 
     return {
         cancel: () => {
-            cancelAnimationFrameForAllBrowser(scheduleId);
+            // console.log('cancelAnimationFrame', scheduleId);
+            if (scheduleId) {
+                cancelAnimationFrameForAllBrowser(scheduleId);
+            } else {
+                console.warn('already done animation');
+            }
         },
     };
 }

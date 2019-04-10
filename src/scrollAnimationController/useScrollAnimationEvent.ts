@@ -13,6 +13,7 @@ interface ArgumentsType {
     wheelEndDebounceTime?: number;
     minSpeedY?: number;
     minSpeedX?: number;
+    cancelCallbackRef?: React.RefObject<Function | null>;
 }
 
 const useScrollAnimationEvent = ({
@@ -21,6 +22,7 @@ const useScrollAnimationEvent = ({
     scrollContainerElement,
     minSpeedY,
     minSpeedX,
+    cancelCallbackRef,
 }: ArgumentsType) => {
     const [event, setEvent] = React.useState<ScrollAnimationEvent | null>(null);
     const [isStartAnimation, setIsStartAnimation] = React.useState<boolean>(false);
@@ -46,6 +48,16 @@ const useScrollAnimationEvent = ({
         }
     }, [isStartAnimation]);
 
+    const scrollAnimationEndTrigger = React.useCallback(() => {
+        setIsEndAnimation(true);
+        setIsStartAnimation(false);
+        setReady(false);
+
+        setEvent({
+            eventName: 'end',
+        });
+    }, []);
+
     if (userScrollTriggerEvent.eventName === 'user-scroll:start') {
         if (isReady !== true) {
             setReady(true);
@@ -54,7 +66,11 @@ const useScrollAnimationEvent = ({
         if (isEndAnimation === true) {
             setIsEndAnimation(false);
         }
-        // TODO: cancel
+
+        if (isStartAnimation == true && isEndAnimation === false) {
+            cancelCallbackRef && cancelCallbackRef.current && cancelCallbackRef.current();
+            scrollAnimationEndTrigger();
+        }
     } else if (isReady && userScrollTriggerEvent.eventName === 'user-scroll:end') {
         // after user event end
         if (domScrollEvent.eventName === 'scroll:move') {
@@ -73,16 +89,6 @@ const useScrollAnimationEvent = ({
             }
         }
     }
-
-    const scrollAnimationEndTrigger = React.useCallback(() => {
-        setIsEndAnimation(true);
-        setIsStartAnimation(false);
-        setReady(false);
-
-        setEvent({
-            eventName: 'end',
-        });
-    }, []);
 
     return {
         event,

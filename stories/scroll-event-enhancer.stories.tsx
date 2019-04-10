@@ -92,17 +92,20 @@ storiesOf('scroll-event-enhancer', module)
             scrollEndDebounceTime: number;
             wheelEndDebounceTime: number;
         }> = ({ scrollEndDebounceTime, wheelEndDebounceTime }) => {
+            const cancelCallbackRef = React.useRef<Function | null>(null);
+
             const { event, scrollAnimationEndTrigger } = useScrollAnimationEvent({
                 scrollContainerElement: document,
                 wheelEndDebounceTime: wheelEndDebounceTime,
                 scrollEndDebounceTime: scrollEndDebounceTime,
                 minSpeedY: 0.3,
+                cancelCallbackRef,
             });
 
             const animationEventName = event && event.eventName;
             React.useEffect(() => {
                 if (animationEventName === 'start') {
-                    smoothScroll({
+                    const { cancel } = smoothScroll({
                         scrollContainerElement: document.documentElement,
                         end: {
                             y: 0,
@@ -110,6 +113,8 @@ storiesOf('scroll-event-enhancer', module)
                         scrollTime: 1000,
                         callback: scrollAnimationEndTrigger,
                     });
+
+                    cancelCallbackRef.current = cancel;
                 }
             }, [animationEventName, scrollAnimationEndTrigger]);
 
