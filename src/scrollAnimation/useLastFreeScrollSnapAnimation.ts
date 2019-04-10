@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { getClosestPointIndex } from '../entryDecision/EntryDecisionMaker';
+import { getClosestAreaIndexFromPoint } from '../util/findArea';
 import { getScrollPosition } from '../util/getScrollPosition';
 import { getLastFreeScrollSnapAnimationInfo } from './lastFreeScrollSnapAnimation';
 import { useScrollAnimationEvent } from '../eventManager/scrollAnimationTriggerEvent/useScrollAnimationEvent';
@@ -50,16 +50,16 @@ function useLastFreeScrollSnapAnimation({
         if (domScrollEvent.eventName === 'scroll:end' && userScrollTriggerEvent.eventName === 'user-scroll:end') {
             if (userScrollStartPosition && scrollAnimationStartPosition) {
                 // from last area && now in last before area ->  animation closest area
-                const { minIndex: startAreaIndex } = getClosestPointIndex({
-                    pointList: snapPointList,
+                const { minIndex: startAreaIndex } = getClosestAreaIndexFromPoint({
+                    areaPointList: snapPointList,
                     checkPoint: userScrollStartPosition.y,
                 });
                 const lastSnapListIndex = snapPointList.length;
                 if (startAreaIndex === lastSnapListIndex - 1) {
                     const nowPosition = getScrollPosition(scrollContainerElement);
                     if (nowPosition.y < snapPointList[lastSnapListIndex]) {
-                        const { minIndex: targetAreaIndex } = getClosestPointIndex({
-                            pointList: snapPointList,
+                        const { minIndex: targetAreaIndex } = getClosestAreaIndexFromPoint({
+                            areaPointList: snapPointList,
                             checkPoint: nowPosition.y,
                         });
 

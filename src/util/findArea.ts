@@ -1,10 +1,14 @@
 interface GetPointIndexArgumentType {
-    pointList: number[];
+    areaPointList: number[];
     checkPoint: number;
-    offset?: number;
+    acceptOffset?: number;
 }
 
-function getPointIndex({ checkPoint, pointList, offset = 5 }: GetPointIndexArgumentType) {
+function getAreaIndexFromPoint({
+    checkPoint,
+    areaPointList: pointList,
+    acceptOffset: offset = 5,
+}: GetPointIndexArgumentType) {
     for (let i = 0; i < pointList.length; i++) {
         // TODO: 리스트가 오름차순이면 최적화 가능
         const nowPoint = pointList[i];
@@ -20,11 +24,11 @@ function getPointIndex({ checkPoint, pointList, offset = 5 }: GetPointIndexArgum
 }
 
 interface GetClosestPointIndexArgumentType {
-    pointList: number[];
+    areaPointList: number[];
     checkPoint: number;
 }
 
-function getClosestPointIndex({ checkPoint, pointList }: GetClosestPointIndexArgumentType) {
+function getClosestAreaIndexFromPoint({ checkPoint, areaPointList: pointList }: GetClosestPointIndexArgumentType) {
     const deltaList = [];
 
     for (let i = 0; i < pointList.length; i++) {
@@ -53,4 +57,4 @@ function getClosestPointIndex({ checkPoint, pointList }: GetClosestPointIndexArg
     };
 }
 
-export { getPointIndex, getClosestPointIndex };
+export { getAreaIndexFromPoint, getClosestAreaIndexFromPoint };
