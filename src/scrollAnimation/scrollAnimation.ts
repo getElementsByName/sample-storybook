@@ -1,4 +1,4 @@
-type ScrollContainerElementType = Element;
+type ScrollContainerElementType = Element | Window;
 
 interface Position {
     x: number;
@@ -46,11 +46,30 @@ interface ArgumentType {
     callback?: Function;
 }
 
+function getScrollPosition(element: ScrollContainerElementType) {
+    if (element === window) {
+        return {
+            x: element.scrollX,
+            y: element.scrollY,
+        };
+    } else {
+        return {
+            x: (element as Element).scrollLeft,
+            y: (element as Element).scrollTop,
+        };
+    }
+}
+
+// disable acceleration
+function getResetScrollCurrentPosition(element: ScrollContainerElementType) {
+    const nowScrollPosition = getScrollPosition(element);
+
+    element.scrollTo(nowScrollPosition.x, nowScrollPosition.y);
+}
+
 function smoothScroll({ callback, scrollContainerElement, end, scrollTime }: ArgumentType) {
-    const start = {
-        y: scrollContainerElement.scrollTop,
-        x: scrollContainerElement.scrollLeft,
-    };
+    const start = getScrollPosition(scrollContainerElement);
+    // getResetScrollCurrentPosition(scrollContainerElement);
 
     const duration = isEdge() ? 0 : scrollTime;
     let startTime: number | null = null;
@@ -79,15 +98,24 @@ function smoothScroll({ callback, scrollContainerElement, end, scrollTime }: Arg
             deltaScrollPosition.x = position(start.x, end.x, elapsed, duration);
         }
 
+        // console.log('deltaScrollPosition', deltaScrollPosition);
+
         scrollContainerElement.scrollTo(deltaScrollPosition.x, deltaScrollPosition.y);
 
         // check if we are over due;
         if (elapsed < duration) {
             scheduleId = requestAnimationFrameForAllBrowser(step);
         } else {
+            // const nowScrollPosition = getScrollPosition(scrollContainerElement);
+
+            // const lastPosition = {
+            //     x: end.x !== undefined ? end.x : nowScrollPosition.x,
+            //     y: end.y !== undefined ? end.y : nowScrollPosition.y,
+            // };
+
+            // scrollContainerElement.scrollTo(lastPosition.x, lastPosition.y);
+
             scheduleId = null;
-            // console.log('animation end');
-            // console.log('animation callback', callback);
             if (typeof callback === 'function') {
                 // is there a callback?
 

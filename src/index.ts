@@ -3,4 +3,5 @@ export * from './eventManager/userScrollTriggerEvent/useUserScrollTriggerEventWa
 export * from './eventManager/scrollAnimationTriggerEvent/useScrollAnimationEvent';
 export * from './scrollAnimation/scrollAnimation';
 export * from './util/useDOMEventHandler';
+export * from './util/getScrollPosition';
 export * from './entryDecision/EntryDecisionMaker';

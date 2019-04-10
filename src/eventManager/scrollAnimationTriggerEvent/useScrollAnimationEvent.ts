@@ -97,6 +97,8 @@ const useScrollAnimationEvent = ({
         userScrollStartPosition,
         scrollAnimationStartPosition,
         scrollAnimationEndPosition,
+        domScrollEvent,
+        userScrollTriggerEvent,
     };
 };
 

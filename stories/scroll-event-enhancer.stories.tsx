@@ -9,6 +9,8 @@ import {
     smoothScroll,
     getPointIndex,
     getClosestPointIndex,
+    getLastFreeScrollSnapAnimationInfo,
+    getScrollPosition,
 } from '../';
 
 import { storiesOf } from '@storybook/react';
@@ -77,6 +79,9 @@ storiesOf('scroll-event-enhancer', module)
         );
     })
     .add('basic - animation event', () => {
+        const snapPointList = [0, 500, 1000];
+        const outOffset = 50;
+
         const scrollEndDebounceTime = number('scrollEndDebounceTime', DEFAULT_DEBOUNCE_TIME_MS);
         const wheelEndDebounceTime = number('wheelEndDebounceTime', DEFAULT_WHEEL_DEBOUNCE_TIME_MS);
 
@@ -92,11 +97,13 @@ storiesOf('scroll-event-enhancer', module)
                 userScrollStartPosition,
                 scrollAnimationStartPosition,
                 scrollAnimationEndPosition,
+                domScrollEvent,
+                userScrollTriggerEvent,
             } = useScrollAnimationEvent({
                 scrollContainerElement: document,
                 wheelEndDebounceTime: wheelEndDebounceTime,
                 scrollEndDebounceTime: scrollEndDebounceTime,
-                minSpeedY: 0.3,
+                minSpeedY: 0.2,
                 cancelCallbackRef,
             });
 
@@ -105,49 +112,71 @@ storiesOf('scroll-event-enhancer', module)
             // console.log('scrollAnimationEndPosition', scrollAnimationEndPosition);
 
             const animationEventName = event && event.eventName;
+
+            React.useEffect(() => {
+                if (
+                    domScrollEvent.eventName === 'scroll:end' &&
+                    userScrollTriggerEvent.eventName === 'user-scroll:end'
+                ) {
+                    if (userScrollStartPosition && scrollAnimationStartPosition) {
+                        // TODO: from last area && now in last before area ->  animation closest area
+                        const { minIndex: startAreaIndex } = getClosestPointIndex({
+                            pointList: snapPointList,
+                            checkPoint: userScrollStartPosition.y,
+                        });
+                        const lastSnapListIndex = snapPointList.length;
+                        if (startAreaIndex === lastSnapListIndex - 1) {
+                            const nowPosition = getScrollPosition(document);
+                            if (nowPosition.y < snapPointList[lastSnapListIndex]) {
+                                const { minIndex: targetAreaIndex } = getClosestPointIndex({
+                                    pointList: snapPointList,
+                                    checkPoint: nowPosition.y,
+                                });
+
+                                if (targetAreaIndex !== null) {
+                                    const { cancel } = smoothScroll({
+                                        scrollContainerElement: window,
+                                        end: {
+                                            y: snapPointList[targetAreaIndex],
+                                        },
+                                        scrollTime: 500,
+                                        callback: scrollAnimationEndTrigger,
+                                    });
+
+                                    cancelCallbackRef.current = cancel;
+
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }, [
+                domScrollEvent.eventName,
+                scrollAnimationEndTrigger,
+                scrollAnimationStartPosition,
+                userScrollStartPosition,
+                userScrollTriggerEvent.eventName,
+            ]);
+
             React.useEffect(() => {
                 if (animationEventName === 'start') {
                     if (userScrollStartPosition && scrollAnimationStartPosition) {
-                        const snapPointList = [0, 500, 1000];
-                        const outOffset = 50;
-
-                        const startIndex = getPointIndex({
-                            checkPoint: userScrollStartPosition.y,
-                            offset: 5,
-                            pointList: snapPointList,
+                        const animationInfo = getLastFreeScrollSnapAnimationInfo({
+                            endPosition: scrollAnimationStartPosition.y,
+                            startPosition: userScrollStartPosition.y,
+                            outOffset: 50,
+                            startOffset: 10,
+                            snapPointList: snapPointList,
                         });
 
-                        const { minIndex: endIndex, minDelta: targetDelta } = getClosestPointIndex({
-                            checkPoint: scrollAnimationStartPosition.y,
-                            pointList: snapPointList,
-                        });
-
-                        let nextIndex: number | null = endIndex;
-                        const lastIndex = snapPointList.length - 1;
-
-                        // 마지막 요소에서 움직이는 경우
-                        if (lastIndex === nextIndex && targetDelta && targetDelta > 0) {
-                            nextIndex = null;
-                        } else if (
-                            // 같은 영역에서 offset을 초과한 경우
-                            startIndex !== null &&
-                            endIndex !== null &&
-                            startIndex === endIndex &&
-                            targetDelta !== null &&
-                            Math.abs(targetDelta) > Math.abs(outOffset)
-                        ) {
-                            nextIndex = targetDelta > 0 ? endIndex + 1 : endIndex - 1;
-                        }
-
-                        if (nextIndex !== null) {
-                            const entryPosition = snapPointList[nextIndex];
-
+                        if (animationInfo !== null) {
                             const { cancel } = smoothScroll({
-                                scrollContainerElement: document.documentElement,
+                                scrollContainerElement: window,
                                 end: {
-                                    y: entryPosition,
+                                    y: animationInfo.animationTargetPosition,
                                 },
-                                scrollTime: 300,
+                                scrollTime: 500,
                                 callback: scrollAnimationEndTrigger,
                             });
 
@@ -158,7 +187,7 @@ storiesOf('scroll-event-enhancer', module)
                     }
                     scrollAnimationEndTrigger();
                 }
-            }, [animationEventName, scrollAnimationEndTrigger]);
+            }, [animationEventName, scrollAnimationEndTrigger, scrollAnimationStartPosition, userScrollStartPosition]);
 
             return (
                 <>
@@ -167,9 +196,19 @@ storiesOf('scroll-event-enhancer', module)
             );
         };
 
+        const elementList = [];
+
+        for (let i = 0; i < snapPointList.length; i++) {
+            elementList.push(
+                <div key={i} style={{ top: `${snapPointList[i]}px`, position: 'absolute', height: 1000 }}>
+                    {i}
+                </div>,
+            );
+        }
+
         return (
             <>
-                <ScrollElement />
+                <div>{elementList}</div>
                 <ScrollAnimationEventWatcher
                     scrollEndDebounceTime={scrollEndDebounceTime}
                     wheelEndDebounceTime={wheelEndDebounceTime}
