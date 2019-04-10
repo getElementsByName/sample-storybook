@@ -2,7 +2,7 @@ import * as React from 'react';
 import { getClosestAreaIndexFromPoint } from '../util/findArea';
 import { getScrollPosition } from '../util/getScrollPosition';
 import { getLastFreeScrollSnapAnimationInfo } from './lastFreeScrollSnapAnimation';
-import { useScrollAnimationEvent } from '../eventManager/scrollAnimationTriggerEvent/useScrollAnimationEvent';
+import { useScrollAnimationEventWatcher } from '../eventManager/scrollAnimationTriggerEvent/useScrollAnimationEventWatcher';
 import { smoothScroll } from './scrollAnimation';
 import { ScrollContainerElementType } from '../eventManager/domScrollEvent/useDOMScrollEventWatcher';
 
@@ -32,7 +32,7 @@ function useLastFreeScrollSnapAnimation({
         scrollAnimationStartPosition,
         domScrollEvent,
         userScrollTriggerEvent,
-    } = useScrollAnimationEvent({
+    } = useScrollAnimationEventWatcher({
         scrollContainerElement: scrollContainerElement,
         wheelEndDebounceTime: wheelEndDebounceTime,
         scrollEndDebounceTime: scrollEndDebounceTime,

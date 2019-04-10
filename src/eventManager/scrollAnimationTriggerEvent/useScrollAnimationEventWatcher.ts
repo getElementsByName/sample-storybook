@@ -13,7 +13,7 @@ interface ArgumentsType {
     cancelCallbackRef?: React.RefObject<Function | null>;
 }
 
-const useScrollAnimationEvent = ({
+const useScrollAnimationEventWatcher = ({
     scrollEndDebounceTime,
     wheelEndDebounceTime,
     scrollContainerElement,
@@ -100,4 +100,4 @@ const useScrollAnimationEvent = ({
     };
 };
 
-export { useScrollAnimationEvent };
+export { useScrollAnimationEventWatcher };

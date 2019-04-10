@@ -5,16 +5,21 @@ export interface PositionXY {
     x: number;
 }
 
+// typescript syntax(user-defined-type-guards): https://www.typescriptlang.org/docs/handbook/advanced-types.html#user-defined-type-guards
+function isDocument(element: ScrollContainerElementType): element is Document {
+    return element === document;
+}
+
 export const getScrollPosition = (element: ScrollContainerElementType): PositionXY => {
-    if (element === document) {
+    if (isDocument(element)) {
         return {
             y: window.scrollY,
             x: window.scrollX,
         };
+    } else {
+        return {
+            y: element.scrollTop,
+            x: element.scrollLeft,
+        };
     }
-
-    return {
-        y: (element as Element).scrollTop,
-        x: (element as Element).scrollLeft,
-    };
 };

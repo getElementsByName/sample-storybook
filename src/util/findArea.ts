@@ -10,7 +10,6 @@ function getAreaIndexFromPoint({
     acceptOffset: offset = 5,
 }: GetPointIndexArgumentType) {
     for (let i = 0; i < pointList.length; i++) {
-        // TODO: 리스트가 오름차순이면 최적화 가능
         const nowPoint = pointList[i];
 
         const delta = Math.abs(checkPoint - nowPoint);
@@ -32,7 +31,6 @@ function getClosestAreaIndexFromPoint({ checkPoint, areaPointList: pointList }: 
     const deltaList = [];
 
     for (let i = 0; i < pointList.length; i++) {
-        // TODO: 리스트가 오름차순이면 최적화 가능
         const nowPoint = pointList[i];
 
         const delta = checkPoint - nowPoint;
@@ -52,7 +50,7 @@ function getClosestAreaIndexFromPoint({ checkPoint, areaPointList: pointList }: 
     }
 
     return {
-        minIndex, // TODO: only number type
+        minIndex,
         minDelta,
     };
 }
