@@ -1,3 +1,5 @@
+import { easeOutCubic } from './easingFunctions';
+
 type ScrollContainerElementType = Element | Window;
 
 interface Position {
@@ -9,16 +11,16 @@ function isEdge() {
     return false;
 }
 
-function easeInCubic(t: number, b: number, c: number, d: number) {
-    const td = t / d;
-    return c * td * td * td + b;
-}
-
 function position(start: number, end: number, elapsed: number, duration: number) {
     if (elapsed > duration) {
         return end;
     }
-    return easeInCubic(elapsed, start, end - start, duration);
+
+    const normalizedDeltaTime = elapsed / duration; // [0, 1]
+    const normalizedNowTimeAfterEasing = easeOutCubic(normalizedDeltaTime);
+    const distance = end - start;
+    const distanceDelta = distance * normalizedNowTimeAfterEasing;
+    return start + distanceDelta;
 }
 
 // get animation frame or a fallback
