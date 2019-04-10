@@ -39,8 +39,8 @@ const useDOMScrollEventWatcher = ({ scrollContainerElement, debounceTime = 300 }
         originalEvent: null,
     });
 
-    const [latestScrollTime, setLatestScrollTime] = React.useState<number | null>(null);
-    const [position, setPosition] = React.useState<Position>(getScrollPosition(scrollContainerElement));
+    const latestScrollTimeRef = React.useRef<number | null>(null);
+    const positionRef = React.useRef<Position>(getScrollPosition(scrollContainerElement));
 
     // start, move
     const scrollHandler = React.useCallback(
@@ -49,11 +49,11 @@ const useDOMScrollEventWatcher = ({ scrollContainerElement, debounceTime = 300 }
             const newPosition = getScrollPosition(scrollContainerElement);
             const eventTime = event.timeStamp;
 
-            if (latestScrollTime) {
-                const deltaTime = eventTime - latestScrollTime;
+            if (latestScrollTimeRef.current) {
+                const deltaTime = eventTime - latestScrollTimeRef.current;
                 const deltaPosition = {
-                    x: newPosition.x - position.x,
-                    y: newPosition.y - position.y,
+                    x: newPosition.x - positionRef.current.x,
+                    y: newPosition.y - positionRef.current.y,
                 };
 
                 resultEvent = {
@@ -70,16 +70,16 @@ const useDOMScrollEventWatcher = ({ scrollContainerElement, debounceTime = 300 }
                     eventName: 'scroll:start',
                     originalEvent: event,
 
-                    scrollY: position.x,
-                    scrollX: position.y,
+                    scrollY: positionRef.current.x,
+                    scrollX: positionRef.current.y,
                 };
             }
 
-            setLatestScrollTime(eventTime);
-            setPosition(newPosition);
+            latestScrollTimeRef.current = eventTime;
+            positionRef.current = newPosition;
             setEvent(resultEvent);
         },
-        [scrollContainerElement, latestScrollTime, position], // TODO: latestScrollTime를 private member로 고려했을때, 적합한 지 다시 생각해봐야함
+        [], // TODO: latestScrollTime를 private member로 고려했을때, 적합한 지 다시 생각해봐야함
     );
 
     useDOMEventHandler(scrollContainerElement, 'scroll', scrollHandler);
@@ -95,7 +95,8 @@ const useDOMScrollEventWatcher = ({ scrollContainerElement, debounceTime = 300 }
 
     React.useEffect(() => {
         const newDebounceCallback = debounce((event: Event) => {
-            setLatestScrollTime(null);
+            latestScrollTimeRef.current = null;
+
             setEvent({
                 eventName: 'scroll:end',
                 originalEvent: event,

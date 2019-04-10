@@ -6,6 +6,7 @@ import {
     useUserScrollTriggerEventWatcher,
     UserScrollTriggerEvent,
     useScrollAnimationEvent,
+    smoothScroll,
 } from '../';
 
 import { storiesOf } from '@storybook/react';
@@ -25,7 +26,20 @@ const Log: React.FC<{ name?: string; msg: any }> = ({ name, msg }) => {
 const ScrollElement: React.FC = () => {
     return (
         <div>
-            <div style={{ width: '100%', height: '1000px' }}>BOX</div>
+            <div style={{ width: '100%', height: '1000px' }}>
+                <div>1</div>
+                <div>1</div>
+                <div>1</div>
+                <div>1</div>
+                <div>1</div>
+                <div>1</div>
+                <div>1</div>
+                <div>1</div>
+                <div>1</div>
+                <div>1</div>
+                <div>1</div>
+                <div>1</div>
+            </div>
             <div style={{ width: '100%', height: '1000px' }}>BOX</div>
             <div style={{ width: '100%', height: '1000px' }}>BOX</div>
             <div style={{ width: '100%', height: '1000px' }}>BOX</div>
@@ -88,7 +102,14 @@ storiesOf('scroll-event-enhancer', module)
             const animationEventName = event && event.eventName;
             React.useEffect(() => {
                 if (animationEventName === 'start') {
-                    setTimeout(scrollAnimationEndTrigger, 1000);
+                    smoothScroll({
+                        scrollContainerElement: document.documentElement,
+                        end: {
+                            y: 0,
+                        },
+                        scrollTime: 1000,
+                        callback: scrollAnimationEndTrigger,
+                    });
                 }
             }, [animationEventName, scrollAnimationEndTrigger]);
 

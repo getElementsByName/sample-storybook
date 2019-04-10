@@ -25,6 +25,7 @@ const useScrollAnimationEvent = ({
     const [event, setEvent] = React.useState<ScrollAnimationEvent | null>(null);
     const [isStartAnimation, setIsStartAnimation] = React.useState<boolean>(false);
     const [isEndAnimation, setIsEndAnimation] = React.useState<boolean>(false);
+    const [isReady, setReady] = React.useState<boolean>(false);
 
     const userScrollTriggerEvent = useUserScrollTriggerEventWatcher({
         scrollContainerElement: scrollContainerElement,
@@ -46,10 +47,15 @@ const useScrollAnimationEvent = ({
     }, [isStartAnimation]);
 
     if (userScrollTriggerEvent.eventName === 'user-scroll:start') {
+        if (isReady !== true) {
+            setReady(true);
+        }
+
         if (isEndAnimation === true) {
             setIsEndAnimation(false);
         }
-    } else if (userScrollTriggerEvent.eventName === 'user-scroll:end') {
+        // TODO: cancel
+    } else if (isReady && userScrollTriggerEvent.eventName === 'user-scroll:end') {
         // after user event end
         if (domScrollEvent.eventName === 'scroll:move') {
             // console.log('domScrollEvent.speedY', Math.abs(domScrollEvent.speedY));
@@ -61,8 +67,8 @@ const useScrollAnimationEvent = ({
                 setStart();
             }
         } else if (domScrollEvent.eventName === 'scroll:end') {
+            // without minSpeed
             if (isEndAnimation === false) {
-                // without minSpeed
                 setStart();
             }
         }
@@ -71,6 +77,7 @@ const useScrollAnimationEvent = ({
     const scrollAnimationEndTrigger = React.useCallback(() => {
         setIsEndAnimation(true);
         setIsStartAnimation(false);
+        setReady(false);
 
         setEvent({
             eventName: 'end',

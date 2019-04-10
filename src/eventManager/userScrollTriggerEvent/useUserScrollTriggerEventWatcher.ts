@@ -20,20 +20,17 @@ const useEventHandler = (
     eventName: string,
     eventHandler: EventHandlerType,
 ) => {
-    const eventHandlerCached = React.useCallback(
-        (event: TouchEvent) => {
-            const originalEventName = event.type;
-            const resultEventNameList = eventNameMappingTable[originalEventName];
+    const eventHandlerCached = React.useCallback((event: TouchEvent) => {
+        const originalEventName = event.type;
+        const resultEventNameList = eventNameMappingTable[originalEventName];
 
-            for (let key in resultEventNameList) {
-                eventHandler({
-                    eventName: resultEventNameList[key],
-                    originalEvent: event,
-                });
-            }
-        },
-        [eventHandler],
-    );
+        for (let key in resultEventNameList) {
+            eventHandler({
+                eventName: resultEventNameList[key],
+                originalEvent: event,
+            });
+        }
+    }, []);
 
     useDOMEventHandler(scrollContainerElement, eventName, eventHandlerCached);
 };
@@ -59,8 +56,8 @@ const useUserScrollTriggerEventWatcher = ({ scrollContainerElement, wheelEndDebo
         debounceTime: wheelEndDebounceTime,
     });
 
-    const wheelPhase = wheelEventPhase.phase;
-    const wheelEvent = wheelEventPhase.functionArgument;
+    const wheelPhase = wheelEventPhase && wheelEventPhase.phase;
+    const wheelEvent = wheelEventPhase && wheelEventPhase.functionArgument;
 
     React.useEffect(() => {
         if (wheelPhase === 'start') {
@@ -81,8 +78,8 @@ const useUserScrollTriggerEventWatcher = ({ scrollContainerElement, wheelEndDebo
         }
     }, [wheelPhase, wheelEvent]);
 
-    useDOMEventHandler(scrollContainerElement, 'mousewheel', wheelEventPhase.triggerCallback); // IE9, Chrome, Safari, Opera
-    useDOMEventHandler(scrollContainerElement, 'DOMMouseScroll', wheelEventPhase.triggerCallback); // Firefox
+    useDOMEventHandler(scrollContainerElement, 'mousewheel', wheelEventPhase && wheelEventPhase.triggerCallback); // IE9, Chrome, Safari, Opera
+    useDOMEventHandler(scrollContainerElement, 'DOMMouseScroll', wheelEventPhase && wheelEventPhase.triggerCallback); // Firefox
 
     return event;
 };

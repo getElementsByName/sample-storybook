@@ -30,6 +30,7 @@ function useContinuousEventPhase<T, R>({ debounceTime }: ArgumentsType<T, R>) {
 
     React.useEffect(() => {
         const newDebounceCallback = debounce(() => {
+            // END
             setStatus(prev => ({ ...prev, ...{ isReady: true, isFirst: true } }));
         }, debounceTime);
 
@@ -43,22 +44,22 @@ function useContinuousEventPhase<T, R>({ debounceTime }: ArgumentsType<T, R>) {
         };
     }, [debounceTime]);
 
-    const triggerCallback = React.useCallback(
-        (args: T) => {
-            if (debounceCallback) {
-                debounceCallback.callback(args);
-            }
+    const [state, triggerCallback] = React.useReducer((state, action: T) => {
+        // TRIGGER EVENT
+        if (debounceCallback) {
+            debounceCallback.callback(action);
+        }
 
-            if (status.isReady) {
-                setStatus(prev => ({ ...prev, ...{ isReady: false, functionArgument: args } }));
-            } else if (status.isFirst) {
-                setStatus(prev => ({ ...prev, ...{ isFirst: false, functionArgument: args } }));
-            } else {
-                setStatus(prev => ({ ...prev, ...{ functionArgument: args } }));
-            }
-        },
-        [debounceCallback, status],
-    );
+        if (status.isReady) {
+            setStatus(prev => ({ ...prev, ...{ isReady: false, functionArgument: action } }));
+        } else if (status.isFirst) {
+            setStatus(prev => ({ ...prev, ...{ isFirst: false, functionArgument: action } }));
+        } else {
+            setStatus(prev => ({ ...prev, ...{ functionArgument: action } }));
+        }
+
+        return null;
+    }, null);
 
     let phaseName: PhaseName;
     if (status.isReady === false && status.isFirst) {
