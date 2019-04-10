@@ -3,15 +3,14 @@ import { ScrollContainerElementType } from '../../util/getScrollPosition';
 import { UserScrollTriggerEvent, UserScrollTriggerEventType } from './UserScrollTriggerEvent';
 import { useDOMEventHandler } from '../../util/useDOMEventHandler';
 import { useContinuousEventPhase } from '../../util/useContinuousEventPhase';
-import { debounce } from '../../util/debounce';
 
 const eventNameMappingTable = {
-    touchstart: ['user-scroll:start'],
-    touchmove: ['user-scroll:move'],
-    touchend: ['user-scroll:end'],
-    touchcancel: ['user-scroll:end'],
-    mousewheel: ['user-scroll:start', 'user-scroll:move'],
-    DOMMouseScroll: ['user-scroll:start', 'user-scroll:move'],
+    touchstart: ['start'],
+    touchmove: ['move'],
+    touchend: ['end'],
+    touchcancel: ['end'],
+    mousewheel: ['start', 'move'],
+    DOMMouseScroll: ['start', 'move'],
 };
 
 type EventHandlerType = (event: UserScrollTriggerEvent) => void;
@@ -42,7 +41,7 @@ interface ArgumentsType {
 
 const useUserScrollTriggerEventWatcher = ({ scrollContainerElement, wheelEndDebounceTime = 1000 }: ArgumentsType) => {
     const [event, setEvent] = React.useState<UserScrollTriggerEvent<UserScrollTriggerEventType | null>>({
-        eventName: 'user-scroll:end',
+        eventName: 'end',
         originalEvent: null,
     });
 
@@ -62,17 +61,17 @@ const useUserScrollTriggerEventWatcher = ({ scrollContainerElement, wheelEndDebo
     React.useEffect(() => {
         if (wheelPhase === 'start') {
             setEvent({
-                eventName: 'user-scroll:start',
+                eventName: 'start',
                 originalEvent: wheelEvent,
             });
         } else if (wheelPhase === 'progress') {
             setEvent({
-                eventName: 'user-scroll:move',
+                eventName: 'move',
                 originalEvent: wheelEvent,
             });
         } else {
             setEvent({
-                eventName: 'user-scroll:end',
+                eventName: 'end',
                 originalEvent: wheelEvent,
             });
         }

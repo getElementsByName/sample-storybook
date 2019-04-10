@@ -1,18 +1,6 @@
 import * as React from 'react';
 
-import {
-    useDOMScrollEventWatcher,
-    ScrollEvent,
-    useUserScrollTriggerEventWatcher,
-    UserScrollTriggerEvent,
-    useScrollAnimationEvent,
-    smoothScroll,
-    getAreaIndexFromPoint,
-    getClosestAreaIndexFromPoint,
-    getLastFreeScrollSnapAnimationInfo,
-    getScrollPosition,
-    useLastFreeScrollSnapAnimation,
-} from '../';
+import { useDOMScrollEventWatcher, useUserScrollTriggerEventWatcher, useLastFreeScrollSnapAnimation } from '../';
 
 import { storiesOf } from '@storybook/react';
 import { number } from '@storybook/addon-knobs';
@@ -81,7 +69,6 @@ storiesOf('scroll-event-enhancer', module)
     })
     .add('basic - animation event', () => {
         const snapPointList = [0, 500, 1000];
-        const outOffset = 50;
 
         const scrollAnimationDuration = number('scrollAnimationDuration', 500);
         const scrollEndDebounceTime = number('scrollEndDebounceTime', DEFAULT_DEBOUNCE_TIME_MS);

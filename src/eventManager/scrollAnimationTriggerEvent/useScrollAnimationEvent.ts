@@ -60,7 +60,7 @@ const useScrollAnimationEvent = ({
         setScrollAnimationEndPosition(getScrollPosition(scrollContainerElement));
     }, []);
 
-    if (userScrollTriggerEvent.eventName === 'user-scroll:start') {
+    if (userScrollTriggerEvent.eventName === 'start') {
         if (isReady !== true) {
             setReady(true);
             setUserScrollStartPosition(getScrollPosition(scrollContainerElement));
@@ -74,18 +74,16 @@ const useScrollAnimationEvent = ({
             cancelCallbackRef && cancelCallbackRef.current && cancelCallbackRef.current(); // TODO: once
             scrollAnimationEndTrigger();
         }
-    } else if (isReady && isEndAnimation === false && userScrollTriggerEvent.eventName === 'user-scroll:end') {
+    } else if (isReady && isEndAnimation === false && userScrollTriggerEvent.eventName === 'end') {
         // after user event end
-        if (domScrollEvent.eventName === 'scroll:move') {
-            // console.log('domScrollEvent.speedY', Math.abs(domScrollEvent.speedY));
-
+        if (domScrollEvent.eventName === 'move') {
             if (
                 (minSpeedY !== undefined && Math.abs(domScrollEvent.speedY) < minSpeedY) ||
                 (minSpeedX !== undefined && Math.abs(domScrollEvent.speedX) < minSpeedX)
             ) {
                 setStart();
             }
-        } else if (domScrollEvent.eventName === 'scroll:end') {
+        } else if (domScrollEvent.eventName === 'end') {
             // without minSpeed
             setStart();
         }

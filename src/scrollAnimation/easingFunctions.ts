@@ -1,3 +1,5 @@
+// https://gist.github.com/gre/1650294
+
 // no easing, no acceleration
 export function linear(t: number) {
     return t;

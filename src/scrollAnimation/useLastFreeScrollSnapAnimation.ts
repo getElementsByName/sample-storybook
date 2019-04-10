@@ -30,7 +30,6 @@ function useLastFreeScrollSnapAnimation({
         scrollAnimationEndTrigger,
         userScrollStartPosition,
         scrollAnimationStartPosition,
-        scrollAnimationEndPosition,
         domScrollEvent,
         userScrollTriggerEvent,
     } = useScrollAnimationEvent({
@@ -41,13 +40,12 @@ function useLastFreeScrollSnapAnimation({
         cancelCallbackRef,
     });
 
-    // console.log('scrollAnimationEndPosition', scrollAnimationEndPosition);
 
     const animationEventName = event && event.eventName;
 
     // adjust position after scroll end
     React.useEffect(() => {
-        if (domScrollEvent.eventName === 'scroll:end' && userScrollTriggerEvent.eventName === 'user-scroll:end') {
+        if (domScrollEvent.eventName === 'end' && userScrollTriggerEvent.eventName === 'end') {
             if (userScrollStartPosition && scrollAnimationStartPosition) {
                 // from last area && now in last before area ->  animation closest area
                 const { minIndex: startAreaIndex } = getClosestAreaIndexFromPoint({
@@ -99,8 +97,8 @@ function useLastFreeScrollSnapAnimation({
                 const animationInfo = getLastFreeScrollSnapAnimationInfo({
                     endPosition: scrollAnimationStartPosition.y,
                     startPosition: userScrollStartPosition.y,
-                    outOffset: 50,
-                    startOffset: 10,
+                    outDeltaOffset: 50,
+                    startAreaAcceptOffset: 10,
                     snapPointList: snapPointList,
                 });
 

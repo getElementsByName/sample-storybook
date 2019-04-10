@@ -4,18 +4,18 @@ function getLastFreeScrollSnapAnimationInfo({
     startPosition,
     snapPointList,
     endPosition,
-    startOffset = 0,
-    outOffset,
+    startAreaAcceptOffset = 0,
+    outDeltaOffset,
 }: {
     startPosition: number;
     snapPointList: number[];
     endPosition: number;
-    startOffset?: number;
-    outOffset: number;
+    startAreaAcceptOffset?: number;
+    outDeltaOffset: number;
 }) {
     const startIndex = getAreaIndexFromPoint({
         checkPoint: startPosition,
-        acceptOffset: startOffset,
+        acceptOffset: startAreaAcceptOffset,
         areaPointList: snapPointList,
     });
 
@@ -36,7 +36,7 @@ function getLastFreeScrollSnapAnimationInfo({
         endIndex !== null &&
         startIndex === endIndex &&
         targetDelta !== null &&
-        Math.abs(targetDelta) > Math.abs(outOffset)
+        Math.abs(targetDelta) > Math.abs(outDeltaOffset)
     ) {
         nextIndex = targetDelta > 0 ? endIndex + 1 : endIndex - 1;
     }

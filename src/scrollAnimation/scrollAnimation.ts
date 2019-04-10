@@ -62,16 +62,8 @@ function getScrollPosition(element: ScrollContainerElementType) {
     }
 }
 
-// disable acceleration
-function getResetScrollCurrentPosition(element: ScrollContainerElementType) {
-    const nowScrollPosition = getScrollPosition(element);
-
-    element.scrollTo(nowScrollPosition.x, nowScrollPosition.y);
-}
-
 function smoothScroll({ callback, scrollContainerElement, end, scrollTime }: ArgumentType) {
     const start = getScrollPosition(scrollContainerElement);
-    // getResetScrollCurrentPosition(scrollContainerElement);
 
     const duration = isEdge() ? 0 : scrollTime;
     let startTime: number | null = null;
@@ -79,7 +71,6 @@ function smoothScroll({ callback, scrollContainerElement, end, scrollTime }: Arg
     let scheduleId: number | null = null;
     // setup the stepping function
     function step(timestamp: number) {
-        // console.log('animation step');
 
         if (!startTime) {
             startTime = timestamp;
@@ -100,27 +91,15 @@ function smoothScroll({ callback, scrollContainerElement, end, scrollTime }: Arg
             deltaScrollPosition.x = position(start.x, end.x, elapsed, duration);
         }
 
-        // console.log('deltaScrollPosition', deltaScrollPosition);
-
         scrollContainerElement.scrollTo(deltaScrollPosition.x, deltaScrollPosition.y);
 
         // check if we are over due;
         if (elapsed < duration) {
             scheduleId = requestAnimationFrameForAllBrowser(step);
         } else {
-            // const nowScrollPosition = getScrollPosition(scrollContainerElement);
-
-            // const lastPosition = {
-            //     x: end.x !== undefined ? end.x : nowScrollPosition.x,
-            //     y: end.y !== undefined ? end.y : nowScrollPosition.y,
-            // };
-
-            // scrollContainerElement.scrollTo(lastPosition.x, lastPosition.y);
-
             scheduleId = null;
             if (typeof callback === 'function') {
                 // is there a callback?
-
                 // stop execution and run the callback
                 return callback(end);
             }

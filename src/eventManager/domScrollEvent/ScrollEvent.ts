@@ -1,8 +1,6 @@
-type ScrollStartEventName = 'scroll:start';
-type ScrollMoveEventName = 'scroll:move';
-type ScrollEndEventName = 'scroll:end';
-// type ScrollMinEventName = 'scroll:min';
-// type ScrollMaxEventName = 'scroll:max';
+type ScrollStartEventName = 'start';
+type ScrollMoveEventName = 'move';
+type ScrollEndEventName = 'end';
 
 export type ScrollEventName = ScrollStartEventName | ScrollMoveEventName | ScrollEndEventName;
 

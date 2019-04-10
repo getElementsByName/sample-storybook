@@ -11,7 +11,7 @@ interface ArgumentsType {
 
 const useDOMScrollEventWatcher = ({ scrollContainerElement, debounceTime = 300 }: ArgumentsType) => {
     const [event, setEvent] = React.useState<ScrollEvent<Event | null>>({
-        eventName: 'scroll:end',
+        eventName: 'end',
         originalEvent: null,
     });
 
@@ -19,44 +19,41 @@ const useDOMScrollEventWatcher = ({ scrollContainerElement, debounceTime = 300 }
     const positionRef = React.useRef<PositionXY>(getScrollPosition(scrollContainerElement));
 
     // start, move
-    const scrollHandler = React.useCallback(
-        (event: Event) => {
-            let resultEvent: ScrollStartEvent | ScrollMoveEvent;
-            const newPosition = getScrollPosition(scrollContainerElement);
-            const eventTime = event.timeStamp;
+    const scrollHandler = React.useCallback((event: Event) => {
+        let resultEvent: ScrollStartEvent | ScrollMoveEvent;
+        const newPosition = getScrollPosition(scrollContainerElement);
+        const eventTime = event.timeStamp;
 
-            if (latestScrollTimeRef.current) {
-                const deltaTime = eventTime - latestScrollTimeRef.current;
-                const deltaPosition = {
-                    x: newPosition.x - positionRef.current.x,
-                    y: newPosition.y - positionRef.current.y,
-                };
+        if (latestScrollTimeRef.current) {
+            const deltaTime = eventTime - latestScrollTimeRef.current;
+            const deltaPosition = {
+                x: newPosition.x - positionRef.current.x,
+                y: newPosition.y - positionRef.current.y,
+            };
 
-                resultEvent = {
-                    eventName: 'scroll:move',
-                    originalEvent: event,
+            resultEvent = {
+                eventName: 'move',
+                originalEvent: event,
 
-                    scrollY: newPosition.y,
-                    scrollX: newPosition.x,
-                    speedY: deltaPosition.y / deltaTime,
-                    speedX: deltaPosition.x / deltaTime,
-                };
-            } else {
-                resultEvent = {
-                    eventName: 'scroll:start',
-                    originalEvent: event,
+                scrollY: newPosition.y,
+                scrollX: newPosition.x,
+                speedY: deltaPosition.y / deltaTime,
+                speedX: deltaPosition.x / deltaTime,
+            };
+        } else {
+            resultEvent = {
+                eventName: 'start',
+                originalEvent: event,
 
-                    scrollY: positionRef.current.x,
-                    scrollX: positionRef.current.y,
-                };
-            }
+                scrollY: positionRef.current.x,
+                scrollX: positionRef.current.y,
+            };
+        }
 
-            latestScrollTimeRef.current = eventTime;
-            positionRef.current = newPosition;
-            setEvent(resultEvent);
-        },
-        [], // TODO: latestScrollTime를 private member로 고려했을때, 적합한 지 다시 생각해봐야함
-    );
+        latestScrollTimeRef.current = eventTime;
+        positionRef.current = newPosition;
+        setEvent(resultEvent);
+    }, []);
 
     useDOMEventHandler(scrollContainerElement, 'scroll', scrollHandler);
 
@@ -74,7 +71,7 @@ const useDOMScrollEventWatcher = ({ scrollContainerElement, debounceTime = 300 }
             latestScrollTimeRef.current = null;
 
             setEvent({
-                eventName: 'scroll:end',
+                eventName: 'end',
                 originalEvent: event,
             });
         }, debounceTime);
