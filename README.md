@@ -1,5 +1,7 @@
 # storybook sample
-- scaffolding for storybook project 
+- scaffolding for storybook project
+- typescript
+- eslint, prettier
 
 ## storybook addon
 - [@storybook/addon-viewport](https://www.npmjs.com/package/@storybook/addon-viewport)
