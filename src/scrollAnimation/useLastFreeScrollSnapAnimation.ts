@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { getClosestAreaIndexFromPoint } from '../util/findArea';
+import { getClosestAreaIndexFromPoint, getAreaIndexByPoint, getAreaStartPointIndex } from '../util/findArea';
 import { getScrollPosition } from '../util/getScrollPosition';
-import { getLastFreeScrollSnapAnimationInfo } from './lastFreeScrollSnapAnimation';
+import { getLastFreeScrollSnapAnimationInfo } from './getLastFreeScrollSnapAnimationInfo';
 import { useScrollAnimationEventWatcher } from '../eventManager/scrollAnimationTriggerEvent/useScrollAnimationEventWatcher';
 import { smoothScroll } from './scrollAnimation';
 import { ScrollContainerElementType } from '../eventManager/domScrollEvent/useDOMScrollEventWatcher';
@@ -20,9 +20,11 @@ function useLastFreeScrollSnapAnimation({
     wheelEndDebounceTime,
     scrollEndDebounceTime,
     animationDurationMs,
-    animationTriggerMinSpeedY = 0.2,
+    animationTriggerMinSpeedY = 0.1,
     scrollContainerElement,
 }: ArgumentType) {
+    const START_AREA_ACCEPT_OFFSET = 10;
+
     const cancelCallbackRef = React.useRef<Function | null>(null);
 
     const {
@@ -30,6 +32,7 @@ function useLastFreeScrollSnapAnimation({
         scrollAnimationEndTrigger,
         userScrollStartPosition,
         scrollAnimationStartPosition,
+        scrollAnimationEndPosition,
         domScrollEvent,
         userScrollTriggerEvent,
     } = useScrollAnimationEventWatcher({
@@ -42,54 +45,6 @@ function useLastFreeScrollSnapAnimation({
 
     const animationEventName = event && event.eventName;
 
-    // adjust position after scroll end
-    React.useEffect(() => {
-        if (domScrollEvent.eventName === 'end' && userScrollTriggerEvent.eventName === 'end') {
-            if (userScrollStartPosition && scrollAnimationStartPosition) {
-                const { minIndex: startAreaIndex } = getClosestAreaIndexFromPoint({
-                    areaPointList: snapPointList,
-                    checkPoint: userScrollStartPosition.y,
-                });
-                const lastSnapListIndex = snapPointList.length;
-
-                // from last area && now in last before area ->  animation closest area with direction
-                if (startAreaIndex === lastSnapListIndex - 1) {
-                    const nowPosition = getScrollPosition(scrollContainerElement);
-                    if (nowPosition.y < snapPointList[lastSnapListIndex]) {
-                        const { minIndex: targetAreaIndex } = getClosestAreaIndexFromPoint({
-                            areaPointList: snapPointList,
-                            checkPoint: nowPosition.y,
-                        });
-
-                        if (targetAreaIndex !== null) {
-                            const { cancel } = smoothScroll({
-                                scrollContainerElement: window,
-                                end: {
-                                    y: snapPointList[targetAreaIndex],
-                                },
-                                scrollTime: animationDurationMs,
-                                callback: scrollAnimationEndTrigger,
-                            });
-
-                            cancelCallbackRef.current = cancel;
-
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-    }, [
-        animationDurationMs,
-        domScrollEvent.eventName,
-        scrollAnimationEndTrigger,
-        scrollAnimationStartPosition,
-        scrollContainerElement,
-        snapPointList,
-        userScrollStartPosition,
-        userScrollTriggerEvent.eventName,
-    ]);
-
     // animation start
     React.useEffect(() => {
         if (animationEventName === 'start') {
@@ -98,7 +53,7 @@ function useLastFreeScrollSnapAnimation({
                     endPosition: scrollAnimationStartPosition.y,
                     startPosition: userScrollStartPosition.y,
                     outDeltaOffset: 50,
-                    startAreaAcceptOffset: 10,
+                    startAreaAcceptOffset: START_AREA_ACCEPT_OFFSET,
                     snapPointList: snapPointList,
                 });
 

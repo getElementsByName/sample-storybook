@@ -68,9 +68,9 @@ storiesOf('scroll-event-enhancer', module)
         );
     })
     .add('basic - animation event', () => {
-        const snapPointList = [0, 500, 1000];
+        const snapPointList = [0, 200, 500];
 
-        const scrollAnimationDuration = number('scrollAnimationDuration', 500);
+        const scrollAnimationDuration = number('scrollAnimationDuration', 300);
         const scrollEndDebounceTime = number('scrollEndDebounceTime', DEFAULT_DEBOUNCE_TIME_MS);
         const wheelEndDebounceTime = number('wheelEndDebounceTime', DEFAULT_WHEEL_DEBOUNCE_TIME_MS);
 
@@ -82,7 +82,7 @@ storiesOf('scroll-event-enhancer', module)
                 scrollContainerElement: document,
                 animationDurationMs: scrollAnimationDuration,
                 snapPointList,
-                animationTriggerMinSpeedY: 0.3,
+                animationTriggerMinSpeedY: 0.1,
                 scrollEndDebounceTime: scrollEndDebounceTime,
                 wheelEndDebounceTime: wheelEndDebounceTime,
             });

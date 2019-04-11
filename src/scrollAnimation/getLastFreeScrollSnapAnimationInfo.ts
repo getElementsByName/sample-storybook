@@ -1,4 +1,4 @@
-import { getClosestAreaIndexFromPoint, getAreaIndexFromPoint } from '../util/findArea';
+import { getClosestAreaIndexFromPoint, getAreaStartPointIndex } from '../util/findArea';
 
 function getLastFreeScrollSnapAnimationInfo({
     startPosition,
@@ -13,7 +13,7 @@ function getLastFreeScrollSnapAnimationInfo({
     startAreaAcceptOffset?: number;
     outDeltaOffset: number;
 }) {
-    const startIndex = getAreaIndexFromPoint({
+    const startIndex = getAreaStartPointIndex({
         checkPoint: startPosition,
         acceptOffset: startAreaAcceptOffset,
         areaPointList: snapPointList,

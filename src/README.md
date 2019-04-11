@@ -3,8 +3,8 @@
 
 
 ### TODO
-- after scroll
-  - adjust next area using direction
+- call animation by programming
+- adjust next area using direction
 
 ### DONE
 - useDebounce -> sample

@@ -1,14 +1,14 @@
-interface GetPointIndexArgumentType {
+interface GetAreaStartPointIndexArgumentType {
     areaPointList: number[];
     checkPoint: number;
     acceptOffset?: number;
 }
 
-function getAreaIndexFromPoint({
+function getAreaStartPointIndex({
     checkPoint,
     areaPointList: pointList,
     acceptOffset: offset = 5,
-}: GetPointIndexArgumentType) {
+}: GetAreaStartPointIndexArgumentType) {
     for (let i = 0; i < pointList.length; i++) {
         const nowPoint = pointList[i];
 
@@ -20,6 +20,28 @@ function getAreaIndexFromPoint({
     }
 
     return null;
+}
+
+interface GetAreaIndexByPointArgumentType {
+    areaPointList: number[];
+    checkPoint: number;
+}
+
+function getAreaIndexByPoint({ checkPoint, areaPointList: pointList }: GetAreaIndexByPointArgumentType) {
+    // 오름 차순 정렬
+    const sortedPointList = [...pointList].sort(function(a, b) {
+        return a - b;
+    });
+
+    for (let i = 0; i < sortedPointList.length; i++) {
+        const nowPoint = sortedPointList[i];
+
+        if (nowPoint > checkPoint) {
+            return i;
+        }
+    }
+
+    return sortedPointList.length - 1;
 }
 
 interface GetClosestPointIndexArgumentType {
@@ -55,4 +77,4 @@ function getClosestAreaIndexFromPoint({ checkPoint, areaPointList: pointList }: 
     };
 }
 
-export { getAreaIndexFromPoint, getClosestAreaIndexFromPoint };
+export { getAreaStartPointIndex, getClosestAreaIndexFromPoint, getAreaIndexByPoint };
