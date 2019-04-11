@@ -3,6 +3,7 @@ import * as React from 'react';
 import { useDOMScrollEventWatcher, useUserScrollTriggerEventWatcher, useLastFreeScrollSnapAnimation } from '../';
 import { storiesOf } from '@storybook/react';
 import { number, button } from '@storybook/addon-knobs';
+import { action } from '@storybook/addon-actions';
 
 const DEFAULT_DEBOUNCE_TIME_MS = 300;
 const DEFAULT_WHEEL_DEBOUNCE_TIME_MS = 500;
@@ -10,7 +11,7 @@ const DEFAULT_WHEEL_DEBOUNCE_TIME_MS = 500;
 // prevent duplicated call log (call log only when props are changed)
 const Log: React.FC<{ name?: string; msg: any }> = ({ name, msg }) => {
     React.useEffect(() => {
-        console.log(name, msg);
+        action(`${name}`)(msg);
     }, [name, msg]);
     return null;
 };
@@ -29,8 +30,8 @@ const ScrollElement: React.FC<{ elementLength?: number }> = ({ elementLength = 2
     );
 };
 
-storiesOf('scroll-event-enhancer', module)
-    .add('basic', () => {
+storiesOf('scroll snap', module)
+    .add('event enhancer', () => {
         const scrollEndDebounceTime = number('scrollEndDebounceTime', DEFAULT_DEBOUNCE_TIME_MS);
         const wheelEndDebounceTime = number('wheelEndDebounceTime', DEFAULT_WHEEL_DEBOUNCE_TIME_MS);
 
@@ -66,7 +67,7 @@ storiesOf('scroll-event-enhancer', module)
             </>
         );
     })
-    .add('basic - animation event', () => {
+    .add('scroll snap demo', () => {
         const snapPointList = [0, 200, 500];
         const LAST_HEIGHT = 3000;
 
@@ -92,11 +93,7 @@ storiesOf('scroll-event-enhancer', module)
             button('scroll1', () => animateScroll({ y: snapPointList[1] }), scrollButtonGroupName);
             button('scroll2', () => animateScroll({ y: snapPointList[2] }), scrollButtonGroupName);
 
-            return (
-                <>
-                    <Log name="scrollAnimationEvent" msg={animationEvent} />
-                </>
-            );
+            return <>{/* <Log name="scrollAnimationEvent" msg={animationEvent} /> */}</>;
         };
 
         const elementList = [];
@@ -133,7 +130,7 @@ storiesOf('scroll-event-enhancer', module)
         );
     })
 
-    .add('basic - container element', () => {
+    .add('TODO: container element', () => {
         return (
             <>
                 <div>

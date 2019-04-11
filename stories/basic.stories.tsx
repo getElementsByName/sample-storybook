@@ -1,13 +1,13 @@
 import * as React from 'react';
 
 import { useDOMEventHandler, useDOMScrollEventWatcher, useUserScrollTriggerEventWatcher } from '../';
-
+import { action } from '@storybook/addon-actions';
 import { storiesOf } from '@storybook/react';
 
 // prevent duplicated call log (call log only when props are changed)
 const Log: React.FC<{ name?: string; msg: any }> = ({ name, msg }) => {
     React.useEffect(() => {
-        console.log(name, msg);
+        action(`${name}`)(msg);
     }, [name, msg]);
     return null;
 };
@@ -40,7 +40,7 @@ storiesOf('basic', module)
     .add('DOM Event', () => {
         const ScrollEventWatcher: React.FC = ({}) => {
             function log(e: Event) {
-                console.log(e);
+                action('event')(e);
             }
 
             useDOMEventHandler(document, 'scroll', log);
@@ -60,7 +60,7 @@ storiesOf('basic', module)
                 scrollContainerElement: document,
             });
 
-            console.log(eventName, originalEvent);
+            action(eventName)(originalEvent);
             return null;
         };
 
@@ -77,7 +77,7 @@ storiesOf('basic', module)
                 scrollContainerElement: document,
             });
 
-            console.log(eventName, originalEvent);
+            action(eventName)(originalEvent);
             return null;
         };
 
