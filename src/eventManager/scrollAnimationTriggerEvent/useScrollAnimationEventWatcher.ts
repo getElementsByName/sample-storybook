@@ -1,11 +1,14 @@
 import * as React from 'react';
 import { ScrollAnimationEvent } from './ScrollAnimationEvent';
-import { useDOMScrollEventWatcher, ScrollContainerElementType } from '../domScrollEvent/useDOMScrollEventWatcher';
+import {
+    useDOMScrollEventWatcher,
+    ScrollListenableContainerElementType,
+} from '../domScrollEvent/useDOMScrollEventWatcher';
 import { useUserScrollTriggerEventWatcher } from '../userScrollTriggerEvent/useUserScrollTriggerEventWatcher';
 import { PositionXY, getScrollPosition } from '../../util/getScrollPosition';
 
 interface ArgumentsType {
-    scrollContainerElement: ScrollContainerElementType;
+    scrollContainerElement: ScrollListenableContainerElementType;
     scrollEndDebounceTime?: number;
     wheelEndDebounceTime?: number;
     minSpeedY?: number;

@@ -4,7 +4,7 @@ import { getScrollPosition } from '../util/getScrollPosition';
 import { getLastFreeScrollSnapAnimationInfo } from './getLastFreeScrollSnapAnimationInfo';
 import { useScrollAnimationEventWatcher } from '../eventManager/scrollAnimationTriggerEvent/useScrollAnimationEventWatcher';
 import { smoothScroll } from './scrollAnimation';
-import { ScrollContainerElementType } from '../eventManager/domScrollEvent/useDOMScrollEventWatcher';
+import { ScrollListenableContainerElementType } from '../eventManager/domScrollEvent/useDOMScrollEventWatcher';
 
 interface ArgumentType {
     snapPointList: number[];
@@ -12,7 +12,7 @@ interface ArgumentType {
     scrollEndDebounceTime?: number;
     animationTriggerMinSpeedY: number;
     animationDurationMs: number;
-    scrollContainerElement: ScrollContainerElementType;
+    scrollContainerElement: ScrollListenableContainerElementType;
 }
 
 function useLastFreeScrollSnapAnimation({

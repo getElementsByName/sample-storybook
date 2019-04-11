@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ScrollListenableContainerElementType } from '../../util/getScrollPosition';
-import { EventWithPhase } from './UserScrollTriggerEvent';
+import { EventWithPhase } from '../EventPhase';
 import { useDOMEventHandler } from '../../util/useDOMEventHandler';
 import { useContinuousEventPhase } from '../../util/useContinuousEventPhase';
 
@@ -35,13 +35,14 @@ const useWheelEventEnhancer = ({ element: scrollContainerElement, wheelEndDeboun
                 originalEvent: wheelEvent,
             });
         } else {
-            //  TODO: 초기값 + 초기화 -> 두번 변경
-            setEvent({
-                eventName: 'end',
-                originalEvent: wheelEvent,
-            });
+            if (event.eventName !== 'end') {
+                setEvent({
+                    eventName: 'end',
+                    originalEvent: wheelEvent,
+                });
+            }
         }
-    }, [wheelPhase, wheelEvent]);
+    }, [wheelPhase, wheelEvent, event.eventName]);
 
     useDOMEventHandler(scrollContainerElement, 'mousewheel', wheelEventPhase && wheelEventPhase.triggerCallback); // IE9, Chrome, Safari, Opera
     useDOMEventHandler(scrollContainerElement, 'DOMMouseScroll', wheelEventPhase && wheelEventPhase.triggerCallback); // Firefox

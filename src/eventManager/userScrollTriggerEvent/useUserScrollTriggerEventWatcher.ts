@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useTouchEventEnhancer } from './useTouchEventEnhancer';
 import { useWheelEventEnhancer } from './useWheelEventEnhancer';
 import { ScrollListenableContainerElementType } from '../../util/getScrollPosition';
-import { EventWithPhase, WheelTouchEventType } from './UserScrollTriggerEvent';
+import { EventWithPhase, WheelTouchEventType } from '../EventPhase';
 
 interface ArgumentsType {
     scrollContainerElement: ScrollListenableContainerElementType;

@@ -31,42 +31,6 @@ const ScrollElement: React.FC<{ elementLength?: number }> = ({ elementLength = 2
 };
 
 storiesOf('scroll snap', module)
-    .add('event enhancer', () => {
-        const scrollEndDebounceTime = number('scrollEndDebounceTime', DEFAULT_DEBOUNCE_TIME_MS);
-        const wheelEndDebounceTime = number('wheelEndDebounceTime', DEFAULT_WHEEL_DEBOUNCE_TIME_MS);
-
-        const ScrollEventWatcher: React.FC<{ scrollEndDebounceTime: number; wheelEndDebounceTime: number }> = ({
-            scrollEndDebounceTime,
-            wheelEndDebounceTime,
-        }) => {
-            const userScrollTriggerEvent = useUserScrollTriggerEventWatcher({
-                scrollContainerElement: document,
-                wheelEndDebounceTime: wheelEndDebounceTime,
-            });
-
-            const domScrollEvent = useDOMScrollEventWatcher({
-                debounceTime: scrollEndDebounceTime,
-                scrollContainerElement: document,
-            });
-
-            return (
-                <>
-                    <Log name="userScrollTriggerEvent" msg={userScrollTriggerEvent} />
-                    <Log name="domScrollEvent" msg={domScrollEvent} />
-                </>
-            );
-        };
-
-        return (
-            <>
-                <ScrollElement />
-                <ScrollEventWatcher
-                    scrollEndDebounceTime={scrollEndDebounceTime}
-                    wheelEndDebounceTime={wheelEndDebounceTime}
-                />
-            </>
-        );
-    })
     .add('scroll snap demo', () => {
         const snapPointList = [0, 200, 500];
         const LAST_HEIGHT = 3000;

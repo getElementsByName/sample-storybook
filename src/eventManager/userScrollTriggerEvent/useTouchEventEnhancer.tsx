@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ScrollListenableContainerElementType } from '../../util/getScrollPosition';
-import { EventWithPhase } from './UserScrollTriggerEvent';
+import { EventWithPhase } from '../EventPhase';
 import { useDOMEventHandler } from '../../util/useDOMEventHandler';
 
 const eventNameMappingTable = {

@@ -6,6 +6,7 @@ import {
     useUserScrollTriggerEventWatcher,
     useWheelEventEnhancer,
     useTouchEventEnhancer,
+    useScrollChangeByUser,
 } from '../';
 import { action } from '@storybook/addon-actions';
 import { storiesOf } from '@storybook/react';
@@ -109,6 +110,25 @@ storiesOf('basic', module)
             React.useEffect(() => {
                 log(userScrollTriggerEvent.eventName, userScrollTriggerEvent);
             }, [userScrollTriggerEvent]);
+            return null;
+        };
+
+        return (
+            <>
+                <GradientList heightList={[300, 600, 1000, 1000]} />
+                <ScrollEventWatcher />
+            </>
+        );
+    })
+    .add('scroll change by user event', () => {
+        const ScrollEventWatcher: React.FC = ({}) => {
+            const scrollChangeByUserEvent = useScrollChangeByUser({
+                scrollContainerElement: document,
+            });
+
+            React.useEffect(() => {
+                log(scrollChangeByUserEvent.eventName, JSON.stringify(scrollChangeByUserEvent.originalEvent));
+            }, [scrollChangeByUserEvent]);
             return null;
         };
 

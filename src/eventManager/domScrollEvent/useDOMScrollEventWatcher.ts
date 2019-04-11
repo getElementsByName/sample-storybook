@@ -45,8 +45,8 @@ const useDOMScrollEventWatcher = ({ scrollContainerElement, debounceTime = 300 }
                 eventName: 'start',
                 originalEvent: event,
 
-                scrollY: positionRef.current.x,
-                scrollX: positionRef.current.y,
+                scrollY: positionRef.current.y,
+                scrollX: positionRef.current.x,
             };
         }
 
@@ -90,4 +90,4 @@ const useDOMScrollEventWatcher = ({ scrollContainerElement, debounceTime = 300 }
     return event;
 };
 
-export { useDOMScrollEventWatcher, ScrollEvent, ScrollListenableContainerElementType as ScrollContainerElementType };
+export { useDOMScrollEventWatcher, ScrollEvent, ScrollListenableContainerElementType };
