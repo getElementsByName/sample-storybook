@@ -26,6 +26,10 @@ function useLastFreeScrollSnapAnimation({
     const START_AREA_ACCEPT_OFFSET = 10;
 
     const cancelCallbackRef = React.useRef<Function | null>(null);
+    const allCancelCallbackRef = React.useRef<Function>(() => {
+        cancelCallbackRef.current !== null && cancelCallbackRef.current();
+        cancelCallbackRef.current = null;
+    });
 
     const {
         event,
@@ -40,7 +44,27 @@ function useLastFreeScrollSnapAnimation({
         wheelEndDebounceTime: wheelEndDebounceTime,
         scrollEndDebounceTime: scrollEndDebounceTime,
         minSpeedY: animationTriggerMinSpeedY,
-        cancelCallbackRef,
+        cancelCallbackRef: allCancelCallbackRef,
+    });
+
+    const animationEndCallbackRef = React.useRef<Function>(() => {
+        scrollAnimationEndTrigger();
+        cancelCallbackRef.current = null;
+    });
+
+    const animateScrollRef = React.useRef(({ y }: { y: number }) => {
+        allCancelCallbackRef.current(); // 이전 애니매이션 종료
+
+        const { cancel } = smoothScroll({
+            scrollContainerElement: window,
+            end: {
+                y,
+            },
+            scrollTime: animationDurationMs,
+            callback: animationEndCallbackRef.current,
+        });
+
+        cancelCallbackRef.current = cancel;
     });
 
     const animationEventName = event && event.eventName;
@@ -58,21 +82,13 @@ function useLastFreeScrollSnapAnimation({
                 });
 
                 if (animationInfo !== null) {
-                    const { cancel } = smoothScroll({
-                        scrollContainerElement: window,
-                        end: {
-                            y: animationInfo.animationTargetPosition,
-                        },
-                        scrollTime: animationDurationMs,
-                        callback: scrollAnimationEndTrigger,
-                    });
-
-                    cancelCallbackRef.current = cancel;
+                    // console.log('user scroll animation trigger')
+                    animateScrollRef.current({ y: animationInfo.animationTargetPosition });
 
                     return;
                 }
             }
-            scrollAnimationEndTrigger();
+            animationEndCallbackRef.current();
         }
     }, [
         animationDurationMs,
@@ -85,6 +101,7 @@ function useLastFreeScrollSnapAnimation({
 
     return {
         animationEvent: event,
+        animateScroll: animateScrollRef.current,
     };
 }
 

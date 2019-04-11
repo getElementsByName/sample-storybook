@@ -4,6 +4,7 @@
 
 ### TODO
 - call animation by programming
+- interrupt by programming trigger with click during user trigger animation
 - adjust next area using direction
 
 ### DONE

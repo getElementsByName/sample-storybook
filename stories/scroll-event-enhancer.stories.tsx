@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { useDOMScrollEventWatcher, useUserScrollTriggerEventWatcher, useLastFreeScrollSnapAnimation } from '../';
-
+import { FixedController } from './storyComponents/FixedController';
 import { storiesOf } from '@storybook/react';
 import { number } from '@storybook/addon-knobs';
 
@@ -69,6 +69,7 @@ storiesOf('scroll-event-enhancer', module)
     })
     .add('basic - animation event', () => {
         const snapPointList = [0, 200, 500];
+        const LAST_HEIGHT = 3000;
 
         const scrollAnimationDuration = number('scrollAnimationDuration', 300);
         const scrollEndDebounceTime = number('scrollEndDebounceTime', DEFAULT_DEBOUNCE_TIME_MS);
@@ -78,7 +79,7 @@ storiesOf('scroll-event-enhancer', module)
             scrollEndDebounceTime: number;
             wheelEndDebounceTime: number;
         }> = ({ scrollEndDebounceTime, wheelEndDebounceTime }) => {
-            const { animationEvent } = useLastFreeScrollSnapAnimation({
+            const { animationEvent, animateScroll } = useLastFreeScrollSnapAnimation({
                 scrollContainerElement: document,
                 animationDurationMs: scrollAnimationDuration,
                 snapPointList,
@@ -86,8 +87,22 @@ storiesOf('scroll-event-enhancer', module)
                 scrollEndDebounceTime: scrollEndDebounceTime,
                 wheelEndDebounceTime: wheelEndDebounceTime,
             });
+
+            const controllerTable = {
+                scroll1: () => {
+                    animateScroll({ y: snapPointList[0] });
+                },
+                scroll2: () => {
+                    animateScroll({ y: snapPointList[1] });
+                },
+                scroll3: () => {
+                    animateScroll({ y: snapPointList[2] });
+                },
+            };
+
             return (
                 <>
+                    <FixedController callbackTable={controllerTable} />
                     <Log name="scrollAnimationEvent" msg={animationEvent} />
                 </>
             );
@@ -96,13 +111,15 @@ storiesOf('scroll-event-enhancer', module)
         const elementList = [];
 
         for (let i = 0; i < snapPointList.length; i++) {
+            const nextPosition = snapPointList[i + 1] ? snapPointList[i + 1] : snapPointList[i] + LAST_HEIGHT;
+            const height = nextPosition - snapPointList[i];
             elementList.push(
                 <div
                     key={i}
                     style={{
                         top: `${snapPointList[i]}px`,
                         position: 'absolute',
-                        height: 1000,
+                        height: `${height}px`,
                         width: '50%',
                         background:
                             'linear-gradient(0deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(0,212,255,1) 100%)',
@@ -116,6 +133,7 @@ storiesOf('scroll-event-enhancer', module)
         return (
             <>
                 <div>{elementList}</div>
+
                 <ScrollAnimationEventWatcher
                     scrollEndDebounceTime={scrollEndDebounceTime}
                     wheelEndDebounceTime={wheelEndDebounceTime}
