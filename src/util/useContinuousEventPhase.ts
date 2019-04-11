@@ -18,7 +18,9 @@ function useContinuousEventPhase<T, R>({ debounceTime }: ArgumentsType<T, R>) {
         // A function argument is special in useState() for merging objects with prev one & new one
         callback: Function;
     }
-    const [debounceCallback, setDebounceCallback] = React.useState<null | DebounceCallbackFromStateType>(null);
+    const debounceCallbackRef = React.useRef<Function>(() => {
+        console.warn('need to debounce function');
+    });
 
     interface StatusType {
         isReady: boolean;
@@ -34,21 +36,17 @@ function useContinuousEventPhase<T, R>({ debounceTime }: ArgumentsType<T, R>) {
             setStatus(prev => ({ ...prev, ...{ isReady: true, isFirst: true } }));
         }, debounceTime);
 
-        setDebounceCallback({
-            callback: newDebounceCallback,
-        });
+        debounceCallbackRef.current = newDebounceCallback;
 
         return () => {
-            setDebounceCallback(null);
             setStatus(INIT_STATUS);
         };
     }, [debounceTime]);
 
     const [state, triggerCallback] = React.useReducer((state, action: T) => {
         // TRIGGER EVENT
-        if (debounceCallback) {
-            debounceCallback.callback(action);
-        }
+
+        debounceCallbackRef.current(action);
 
         if (status.isReady) {
             setStatus(prev => ({ ...prev, ...{ isReady: false, functionArgument: action } }));

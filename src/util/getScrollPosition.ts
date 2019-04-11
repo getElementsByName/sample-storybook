@@ -1,4 +1,4 @@
-export type ScrollContainerElementType = Element | Document;
+export type ScrollListenableContainerElementType = Element | Document;
 
 export interface PositionXY {
     y: number;
@@ -6,11 +6,11 @@ export interface PositionXY {
 }
 
 // typescript syntax(user-defined-type-guards): https://www.typescriptlang.org/docs/handbook/advanced-types.html#user-defined-type-guards
-function isDocument(element: ScrollContainerElementType): element is Document {
+function isDocument(element: ScrollListenableContainerElementType): element is Document {
     return element === document;
 }
 
-export const getScrollPosition = (element: ScrollContainerElementType): PositionXY => {
+export const getScrollPosition = (element: ScrollListenableContainerElementType): PositionXY => {
     if (isDocument(element)) {
         return {
             y: window.scrollY,

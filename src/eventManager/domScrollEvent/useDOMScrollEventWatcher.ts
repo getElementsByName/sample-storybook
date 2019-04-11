@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { useDOMEventHandler } from '../../util/useDOMEventHandler';
 import { ScrollEvent, ScrollStartEvent, ScrollMoveEvent } from './ScrollEvent';
-import { getScrollPosition, ScrollContainerElementType, PositionXY } from '../../util/getScrollPosition';
+import { getScrollPosition, ScrollListenableContainerElementType, PositionXY } from '../../util/getScrollPosition';
 import { debounce } from '../../util/debounce';
 
 interface ArgumentsType {
-    scrollContainerElement: ScrollContainerElementType;
+    scrollContainerElement: ScrollListenableContainerElementType;
     debounceTime?: number;
 }
 
@@ -90,4 +90,4 @@ const useDOMScrollEventWatcher = ({ scrollContainerElement, debounceTime = 300 }
     return event;
 };
 
-export { useDOMScrollEventWatcher, ScrollEvent, ScrollContainerElementType };
+export { useDOMScrollEventWatcher, ScrollEvent, ScrollListenableContainerElementType as ScrollContainerElementType };

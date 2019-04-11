@@ -1,89 +1,120 @@
 import * as React from 'react';
 
-import { useDOMEventHandler, useDOMScrollEventWatcher, useUserScrollTriggerEventWatcher } from '../';
+import {
+    useDOMEventHandler,
+    useDOMScrollEventWatcher,
+    useUserScrollTriggerEventWatcher,
+    useWheelEventEnhancer,
+    useTouchEventEnhancer,
+} from '../';
 import { action } from '@storybook/addon-actions';
 import { storiesOf } from '@storybook/react';
+import { GradientList } from './storyComponents/GradientList';
+
+function log(name: string, e: any) {
+    action(name)(e);
+    console.log(name, e);
+}
 
 // prevent duplicated call log (call log only when props are changed)
 const Log: React.FC<{ name?: string; msg: any }> = ({ name, msg }) => {
     React.useEffect(() => {
-        action(`${name}`)(msg);
+        log(`${name}`, msg);
     }, [name, msg]);
     return null;
 };
 
-const ScrollElement: React.FC = () => {
-    return (
-        <div>
-            <div style={{ width: '100%', height: '1000px' }}>
-                <div>1</div>
-                <div>1</div>
-                <div>1</div>
-                <div>1</div>
-                <div>1</div>
-                <div>1</div>
-                <div>1</div>
-                <div>1</div>
-                <div>1</div>
-                <div>1</div>
-                <div>1</div>
-                <div>1</div>
-            </div>
-            <div style={{ width: '100%', height: '1000px' }}>BOX</div>
-            <div style={{ width: '100%', height: '1000px' }}>BOX</div>
-            <div style={{ width: '100%', height: '1000px' }}>BOX</div>
-        </div>
-    );
-};
-
 storiesOf('basic', module)
     .add('DOM Event', () => {
-        const ScrollEventWatcher: React.FC = ({}) => {
-            function log(e: Event) {
-                action('event')(e);
-            }
+        function eventHandler(e: Event) {
+            log('scroll', e);
+        }
 
-            useDOMEventHandler(document, 'scroll', log);
+        const ScrollEventWatcher: React.FC = ({}) => {
+            useDOMEventHandler(document, 'scroll event from DOM', eventHandler);
             return null;
         };
 
         return (
             <>
-                <ScrollElement />
+                <GradientList heightList={[300, 600, 1000, 1000]} />
                 <ScrollEventWatcher />
             </>
         );
     })
-    .add('DOM scroll Event', () => {
+    .add('DOM scroll event enhancer', () => {
         const ScrollEventWatcher: React.FC = ({}) => {
-            const { eventName, originalEvent } = useDOMScrollEventWatcher({
+            const domScrollEvent = useDOMScrollEventWatcher({
                 scrollContainerElement: document,
             });
 
-            action(eventName)(originalEvent);
+            React.useEffect(() => {
+                log(domScrollEvent.eventName, domScrollEvent);
+            }, [domScrollEvent]);
             return null;
         };
 
         return (
             <>
-                <ScrollElement />
+                <GradientList heightList={[300, 600, 1000, 1000]} />
+                <ScrollEventWatcher />
+            </>
+        );
+    })
+    .add('wheel event enhancer', () => {
+        const ScrollEventWatcher: React.FC = ({}) => {
+            const wheelEvent = useWheelEventEnhancer({
+                element: document,
+                wheelEndDebounceTime: 500,
+            });
+
+            React.useEffect(() => {
+                log(wheelEvent.eventName, wheelEvent);
+            }, [wheelEvent]);
+            return null;
+        };
+
+        return (
+            <>
+                <GradientList heightList={[300, 600, 1000, 1000]} />
+                <ScrollEventWatcher />
+            </>
+        );
+    })
+    .add('touch event enhancer', () => {
+        const ScrollEventWatcher: React.FC = ({}) => {
+            const touchEvent = useTouchEventEnhancer({
+                element: document,
+            });
+
+            React.useEffect(() => {
+                log(touchEvent.eventName, touchEvent);
+            }, [touchEvent]);
+            return null;
+        };
+
+        return (
+            <>
+                <GradientList heightList={[300, 600, 1000, 1000]} />
                 <ScrollEventWatcher />
             </>
         );
     })
     .add('user scroll Event', () => {
         const ScrollEventWatcher: React.FC = ({}) => {
-            const { eventName, originalEvent } = useUserScrollTriggerEventWatcher({
+            const userScrollTriggerEvent = useUserScrollTriggerEventWatcher({
                 scrollContainerElement: document,
             });
 
-            action(eventName)(originalEvent);
+            React.useEffect(() => {
+                log(userScrollTriggerEvent.eventName, userScrollTriggerEvent);
+            }, [userScrollTriggerEvent]);
             return null;
         };
 
         return (
             <>
-                <ScrollElement />
+                <GradientList heightList={[300, 600, 1000, 1000]} />
                 <ScrollEventWatcher />
             </>
         );

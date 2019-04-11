@@ -1,7 +1,7 @@
-export type UserScrollTriggerEventType = TouchEvent | WheelEvent;
-export type UserScrollEventNameType = 'start' | 'move' | 'end';
+export type WheelTouchEventType = TouchEvent | WheelEvent;
+export type EventPhaseNameType = 'start' | 'move' | 'end';
 
-export interface UserScrollTriggerEvent<T = UserScrollTriggerEventType> {
-    eventName: UserScrollEventNameType;
+export interface EventWithPhase<T = WheelTouchEventType> {
+    eventName: EventPhaseNameType;
     originalEvent: T;
 }
