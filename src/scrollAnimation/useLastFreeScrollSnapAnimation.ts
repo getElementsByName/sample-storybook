@@ -38,7 +38,6 @@ function useLastFreeScrollSnapAnimation({
         scrollAnimationStartPosition,
         scrollAnimationEndPosition,
         domScrollEvent,
-        userScrollTriggerEvent,
     } = useScrollAnimationEventWatcher({
         scrollContainerElement: scrollContainerElement,
         wheelEndDebounceTime: wheelEndDebounceTime,

@@ -19,7 +19,7 @@ const useDOMScrollEventWatcher = ({ scrollContainerElement, debounceTime = 300 }
     const positionRef = React.useRef<PositionXY>(getScrollPosition(scrollContainerElement));
 
     // start, move
-    const scrollHandler = React.useCallback((event: Event) => {
+    const scrollHandler = React.useRef((event: Event) => {
         let resultEvent: ScrollStartEvent | ScrollMoveEvent;
         const newPosition = getScrollPosition(scrollContainerElement);
         const eventTime = event.timeStamp;
@@ -53,7 +53,7 @@ const useDOMScrollEventWatcher = ({ scrollContainerElement, debounceTime = 300 }
         latestScrollTimeRef.current = eventTime;
         positionRef.current = newPosition;
         setEvent(resultEvent);
-    }, []);
+    }).current;
 
     useDOMEventHandler(scrollContainerElement, 'scroll', scrollHandler);
 
