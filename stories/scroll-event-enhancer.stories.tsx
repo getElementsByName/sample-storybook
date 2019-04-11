@@ -1,9 +1,8 @@
 import * as React from 'react';
 
 import { useDOMScrollEventWatcher, useUserScrollTriggerEventWatcher, useLastFreeScrollSnapAnimation } from '../';
-import { FixedController } from './storyComponents/FixedController';
 import { storiesOf } from '@storybook/react';
-import { number } from '@storybook/addon-knobs';
+import { number, button } from '@storybook/addon-knobs';
 
 const DEFAULT_DEBOUNCE_TIME_MS = 300;
 const DEFAULT_WHEEL_DEBOUNCE_TIME_MS = 500;
@@ -88,21 +87,13 @@ storiesOf('scroll-event-enhancer', module)
                 wheelEndDebounceTime: wheelEndDebounceTime,
             });
 
-            const controllerTable = {
-                scroll1: () => {
-                    animateScroll({ y: snapPointList[0] });
-                },
-                scroll2: () => {
-                    animateScroll({ y: snapPointList[1] });
-                },
-                scroll3: () => {
-                    animateScroll({ y: snapPointList[2] });
-                },
-            };
+            const scrollButtonGroupName = 'scrollTo';
+            button('scroll0', () => animateScroll({ y: snapPointList[0] }), scrollButtonGroupName);
+            button('scroll1', () => animateScroll({ y: snapPointList[1] }), scrollButtonGroupName);
+            button('scroll2', () => animateScroll({ y: snapPointList[2] }), scrollButtonGroupName);
 
             return (
                 <>
-                    <FixedController callbackTable={controllerTable} />
                     <Log name="scrollAnimationEvent" msg={animationEvent} />
                 </>
             );
