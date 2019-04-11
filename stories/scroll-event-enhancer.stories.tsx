@@ -82,7 +82,7 @@ storiesOf('scroll-event-enhancer', module)
                 scrollContainerElement: document,
                 animationDurationMs: scrollAnimationDuration,
                 snapPointList,
-                animationTriggerMinSpeedY: 0.1,
+                animationTriggerMinSpeedY: 0.3,
                 scrollEndDebounceTime: scrollEndDebounceTime,
                 wheelEndDebounceTime: wheelEndDebounceTime,
             });

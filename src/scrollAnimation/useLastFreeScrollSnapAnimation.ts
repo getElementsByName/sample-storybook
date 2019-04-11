@@ -52,7 +52,7 @@ function useLastFreeScrollSnapAnimation({
                 const animationInfo = getLastFreeScrollSnapAnimationInfo({
                     endPosition: scrollAnimationStartPosition.y,
                     startPosition: userScrollStartPosition.y,
-                    outDeltaOffset: 50,
+                    outDeltaOffset: 10,
                     startAreaAcceptOffset: START_AREA_ACCEPT_OFFSET,
                     snapPointList: snapPointList,
                 });
