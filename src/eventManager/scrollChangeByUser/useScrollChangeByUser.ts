@@ -42,7 +42,7 @@ const useScrollChangeByUser = ({ scrollContainerElement }: ArgumentsType) => {
   React.useEffect(() => {
     if (domScrollEvent === null) return;
 
-    if (userScrollTriggerEvent.eventName !== 'end' && domScrollEvent.eventName !== 'end') {
+    if (userScrollTriggerEvent.eventName === 'move' && domScrollEvent.eventName !== 'end') {
       if (event.eventName === 'end') {
         setEvent({
           eventName: 'start',

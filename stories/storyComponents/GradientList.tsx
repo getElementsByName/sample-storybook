@@ -15,7 +15,7 @@ const GradientList: React.FC<ArgumentType> = ({ heightList }) => {
         style={{
           top: `${nowHeight[i]}px`,
           height: `${nowHeight}px`,
-          width: '90%',
+          width: '100%',
           background: 'linear-gradient(0deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(0,212,255,1) 100%)',
           fontSize: 40,
           fontWeight: 'bold',

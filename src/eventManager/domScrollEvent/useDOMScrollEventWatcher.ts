@@ -31,8 +31,10 @@ const useDOMScrollEventWatcher = ({ scrollContainerElement, debounceTime = 300 }
       originalEvent: null,
       scrollX: positionRef.current.x,
       scrollY: positionRef.current.y,
-      directionX: 0,
-      directionY: 0,
+      previous: {
+        directionX: 0,
+        directionY: 0,
+      },
     });
   }, [scrollContainerElement]);
 
@@ -126,7 +128,9 @@ const useDOMScrollEventWatcher = ({ scrollContainerElement, debounceTime = 300 }
         originalEvent: event,
         scrollX: newPosition.x,
         scrollY: newPosition.y,
-        ...direction,
+        previous: {
+          ...direction,
+        },
       });
     }, debounceTime);
 

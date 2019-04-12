@@ -82,12 +82,12 @@ function smoothScroll({ callback, scrollContainerElement, end, scrollTime }: Arg
     };
     // change position on y-axis if result is a number.
     if (end.y !== undefined && !Number.isNaN(end.y)) {
-      deltaScrollPosition.y = position(start.y, end.y, elapsed, duration);
+      deltaScrollPosition.y = Math.floor(position(start.y, end.y, elapsed, duration));
     }
 
     // change position on x-axis if result is a number.
     if (end.x !== undefined && !Number.isNaN(end.x)) {
-      deltaScrollPosition.x = position(start.x, end.x, elapsed, duration);
+      deltaScrollPosition.x = Math.floor(position(start.x, end.x, elapsed, duration));
     }
 
     scrollContainerElement.scrollTo(deltaScrollPosition.x, deltaScrollPosition.y);

@@ -60,8 +60,9 @@ export interface ScrollMoveEvent<T = Event>
   eventName: ScrollMoveEventName;
 }
 
-export interface ScrollEndEvent<T = Event> extends CommonScrollEvent<T>, ScrollPosition, DirectionType {
+export interface ScrollEndEvent<T = Event> extends CommonScrollEvent<T>, ScrollPosition {
   eventName: ScrollEndEventName;
+  previous: DirectionType;
 }
 
 export type ScrollEvent<T = Event> = ScrollStartEvent<T> | ScrollMoveEvent<T> | ScrollEndEvent<T>;

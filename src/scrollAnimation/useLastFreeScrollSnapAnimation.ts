@@ -7,7 +7,6 @@ import { ScrollListenableContainerElementType } from '../eventManager/domScrollE
 interface ArgumentType {
   snapPointList: number[];
   wheelEndDebounceTime?: number;
-  scrollEndDebounceTime?: number;
   animationTriggerMinSpeedY: number;
   animationDurationMs: number;
   scrollContainerElement: ScrollListenableContainerElementType;
@@ -16,7 +15,6 @@ interface ArgumentType {
 function useLastFreeScrollSnapAnimation({
   snapPointList,
   wheelEndDebounceTime,
-  scrollEndDebounceTime,
   animationDurationMs,
   animationTriggerMinSpeedY = 0.05,
   scrollContainerElement,
@@ -34,12 +32,10 @@ function useLastFreeScrollSnapAnimation({
     scrollAnimationEndTrigger,
     userScrollStartPosition,
     scrollAnimationStartPosition,
-    scrollAnimationEndPosition,
-    domScrollEvent,
   } = useScrollAnimationEventWatcher({
     scrollContainerElement: scrollContainerElement,
     wheelEndDebounceTime: wheelEndDebounceTime,
-    scrollEndDebounceTime: scrollEndDebounceTime,
+    scrollEndDebounceTime: 300,
     minSpeedY: animationTriggerMinSpeedY,
     cancelCallbackRef: allCancelCallbackRef,
   });
@@ -52,6 +48,7 @@ function useLastFreeScrollSnapAnimation({
   const animateScrollRef = React.useRef(({ y }: { y: number }) => {
     allCancelCallbackRef.current(); // 이전 애니매이션 종료
 
+    // console.log('animation', y)
     const { cancel } = smoothScroll({
       scrollContainerElement: window,
       end: {
