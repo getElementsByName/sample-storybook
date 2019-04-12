@@ -62,8 +62,31 @@ function getScrollPosition(element: ScrollContainerElementType) {
   }
 }
 
+function isNoNeedToAnimate(nowPosition: Position, requestPosition: Partial<Position>) {
+  const isSameX = nowPosition.x === requestPosition.x;
+  const isSameY = nowPosition.y === requestPosition.y;
+
+  return (
+    (isSameX && isSameY) || (requestPosition.x !== undefined && isSameX) || (requestPosition.y !== undefined && isSameY)
+  );
+}
+
+const getAnimationEndCallback = (callback?: Function) => () => {
+  if (typeof callback === 'function') {
+    // is there a callback?
+    // stop execution and run the callback
+    return callback();
+  }
+};
+
 function smoothScroll({ callback, scrollContainerElement, end, scrollTime }: ArgumentType) {
+  const animationEndCallback = getAnimationEndCallback(callback);
   const start = getScrollPosition(scrollContainerElement);
+
+  // no need to animate
+  if (isNoNeedToAnimate(start, end)) {
+    return { cancel: () => {}, willAnimate: false };
+  }
 
   const duration = isEdge() ? 0 : scrollTime;
   let startTime: number | null = null;
@@ -97,16 +120,13 @@ function smoothScroll({ callback, scrollContainerElement, end, scrollTime }: Arg
       scheduleId = requestAnimationFrameForAllBrowser(step);
     } else {
       scheduleId = null;
-      if (typeof callback === 'function') {
-        // is there a callback?
-        // stop execution and run the callback
-        return callback(end);
-      }
+      animationEndCallback();
     }
   }
   scheduleId = requestAnimationFrameForAllBrowser(step);
 
   return {
+    willAnimate: true,
     cancel: () => {
       // console.log('cancelAnimationFrame', scheduleId);
       if (scheduleId) {

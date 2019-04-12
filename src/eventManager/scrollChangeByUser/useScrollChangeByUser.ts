@@ -103,6 +103,7 @@ const useScrollChangeByUser = ({ scrollContainerElement, wheelEndDebounceTime }:
     domScrollEvent,
     scrollContainerElement,
     event.originalEvent,
+    userScrollTriggerEvent.type,
   ]);
 
   return event;

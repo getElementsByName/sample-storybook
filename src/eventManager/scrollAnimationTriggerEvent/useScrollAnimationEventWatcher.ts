@@ -47,10 +47,10 @@ const useScrollAnimationEventWatcher = ({
   const setStart = React.useRef(() => {
     if (isStartAnimationRef.current === false && isScrollMovedRef.current === true) {
       isStartAnimationRef.current = true;
+      setScrollAnimationStartPosition(getScrollPosition(scrollContainerElement));
       setEvent({
         eventName: 'start',
       });
-      setScrollAnimationStartPosition(getScrollPosition(scrollContainerElement));
     }
   }).current;
 
@@ -58,11 +58,11 @@ const useScrollAnimationEventWatcher = ({
     isEndAnimationRef.current = true;
     isStartAnimationRef.current = false;
     isReadyRef.current = false;
+    setScrollAnimationEndPosition(getScrollPosition(scrollContainerElement));
 
     setEvent({
       eventName: 'end',
     });
-    setScrollAnimationEndPosition(getScrollPosition(scrollContainerElement));
   }).current;
 
   if (scrollChangeByUserEvent.eventName === 'start') {
@@ -70,6 +70,7 @@ const useScrollAnimationEventWatcher = ({
 
     if (isReadyRef.current !== true) {
       isReadyRef.current = true;
+
       setUserScrollStartPosition(
         scrollChangeByUserEvent.originalEvent && scrollChangeByUserEvent.originalEvent.nowPosition,
       );

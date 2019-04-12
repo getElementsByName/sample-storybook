@@ -9,6 +9,7 @@ interface ArgumentType {
   wheelEndDebounceTime?: number;
   animationTriggerMinSpeedY: number;
   animationDurationMs: number;
+  outOffset?: number;
   scrollContainerElement: ScrollListenableContainerElementType;
 }
 
@@ -16,11 +17,10 @@ function useLastFreeScrollSnap({
   snapPointList,
   wheelEndDebounceTime,
   animationDurationMs,
+  outOffset = 30,
   animationTriggerMinSpeedY = 0.05,
   scrollContainerElement,
 }: ArgumentType) {
-  const START_AREA_ACCEPT_OFFSET = 10;
-
   const [animationTargetPosition, setAnimationStateForReturn] = React.useState<{ y: number } | null>(null);
   const cancelCallbackRef = React.useRef<Function | null>(null);
   const allCancelCallbackRef = React.useRef<Function>(() => {
@@ -51,7 +51,7 @@ function useLastFreeScrollSnap({
     allCancelCallbackRef.current(); // 이전 애니매이션 종료
 
     // console.log('animation', y)
-    const { cancel } = smoothScroll({
+    const { cancel, willAnimate } = smoothScroll({
       scrollContainerElement: window,
       end: {
         y,
@@ -60,8 +60,12 @@ function useLastFreeScrollSnap({
       callback: animationEndCallbackRef.current,
     });
 
-    cancelCallbackRef.current = cancel;
-    setAnimationStateForReturn({ y: y });
+    if (willAnimate) {
+      cancelCallbackRef.current = cancel;
+      setAnimationStateForReturn({ y: y });
+    } else {
+      animationEndCallbackRef.current();
+    }
   });
 
   const animationEventName = event && event.eventName;
@@ -73,8 +77,8 @@ function useLastFreeScrollSnap({
         const animationInfo = getLastFreeScrollSnapAnimationInfo({
           endPosition: scrollAnimationStartPosition.y,
           startPosition: userScrollStartPosition.y,
-          outDeltaOffset: 10,
-          startAreaAcceptOffset: START_AREA_ACCEPT_OFFSET,
+          outOffset: outOffset,
+          startAreaAcceptOffset: 10,
           snapPointList: snapPointList,
         });
 
@@ -90,6 +94,7 @@ function useLastFreeScrollSnap({
   }, [
     animationDurationMs,
     animationEventName,
+    outOffset,
     scrollAnimationEndTrigger,
     scrollAnimationStartPosition,
     snapPointList,

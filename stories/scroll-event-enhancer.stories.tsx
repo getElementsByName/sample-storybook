@@ -22,7 +22,7 @@ storiesOf('scroll snap', module)
     const heightList = [200, 300, 4000];
     const snapPointList = [0, heightList[0], heightList[0] + heightList[1]];
 
-    const scrollAnimationDuration = number('scrollAnimationDuration', 300);
+    const scrollAnimationDuration = number('scrollAnimationDuration', 350);
     const wheelEndDebounceTime = number('wheelEndDebounceTime', DEFAULT_WHEEL_DEBOUNCE_TIME_MS);
 
     const ScrollAnimationEventWatcher: React.FC<{
