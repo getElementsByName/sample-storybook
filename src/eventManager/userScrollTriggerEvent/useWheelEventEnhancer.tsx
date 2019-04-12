@@ -5,49 +5,49 @@ import { useDOMEventHandler } from '../../util/useDOMEventHandler';
 import { useContinuousEventPhase } from '../../util/useContinuousEventPhase';
 
 interface ArgumentsType {
-    element: ScrollListenableContainerElementType;
-    wheelEndDebounceTime?: number;
+  element: ScrollListenableContainerElementType;
+  wheelEndDebounceTime?: number;
 }
 
 const useWheelEventEnhancer = ({ element: scrollContainerElement, wheelEndDebounceTime = 1000 }: ArgumentsType) => {
-    const [event, setEvent] = React.useState<EventWithPhase<WheelEvent | null>>({
-        eventName: 'end',
-        originalEvent: null,
-    });
+  const [event, setEvent] = React.useState<EventWithPhase<WheelEvent | null>>({
+    eventName: 'end',
+    originalEvent: null,
+  });
 
-    // wheel: start | move
-    const wheelEventPhase = useContinuousEventPhase<WheelEvent, void>({
-        debounceTime: wheelEndDebounceTime,
-    });
+  // wheel: start | move
+  const wheelEventPhase = useContinuousEventPhase<WheelEvent, void>({
+    debounceTime: wheelEndDebounceTime,
+  });
 
-    const wheelPhase = wheelEventPhase && wheelEventPhase.phase;
-    const wheelEvent = wheelEventPhase && wheelEventPhase.functionArgument;
+  const wheelPhase = wheelEventPhase && wheelEventPhase.phase;
+  const wheelEvent = wheelEventPhase && wheelEventPhase.functionArgument;
 
-    React.useEffect(() => {
-        if (wheelPhase === 'start') {
-            setEvent({
-                eventName: 'start',
-                originalEvent: wheelEvent,
-            });
-        } else if (wheelPhase === 'progress') {
-            setEvent({
-                eventName: 'move',
-                originalEvent: wheelEvent,
-            });
-        } else {
-            if (event.eventName !== 'end') {
-                setEvent({
-                    eventName: 'end',
-                    originalEvent: wheelEvent,
-                });
-            }
-        }
-    }, [wheelPhase, wheelEvent, event.eventName]);
+  React.useEffect(() => {
+    if (wheelPhase === 'start') {
+      setEvent({
+        eventName: 'start',
+        originalEvent: wheelEvent,
+      });
+    } else if (wheelPhase === 'progress') {
+      setEvent({
+        eventName: 'move',
+        originalEvent: wheelEvent,
+      });
+    } else {
+      if (event.eventName !== 'end') {
+        setEvent({
+          eventName: 'end',
+          originalEvent: wheelEvent,
+        });
+      }
+    }
+  }, [wheelPhase, wheelEvent, event.eventName]);
 
-    useDOMEventHandler(scrollContainerElement, 'mousewheel', wheelEventPhase && wheelEventPhase.triggerCallback); // IE9, Chrome, Safari, Opera
-    useDOMEventHandler(scrollContainerElement, 'DOMMouseScroll', wheelEventPhase && wheelEventPhase.triggerCallback); // Firefox
+  useDOMEventHandler(scrollContainerElement, 'mousewheel', wheelEventPhase && wheelEventPhase.triggerCallback); // IE9, Chrome, Safari, Opera
+  useDOMEventHandler(scrollContainerElement, 'DOMMouseScroll', wheelEventPhase && wheelEventPhase.triggerCallback); // Firefox
 
-    return event;
+  return event;
 };
 
 export { useWheelEventEnhancer };

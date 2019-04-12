@@ -5,16 +5,16 @@
 // N milliseconds. If `immediate` is passed, trigger the function on the
 // leading edge, instead of the trailing.
 export function debounce<T extends Function>(func: T, wait: number, immediate?: boolean) {
-    let timeout: any;
+  let timeout: any;
 
-    return (((...args: any[]) => {
-        const later = () => {
-            timeout = null;
-            if (!immediate) func.apply(null, args);
-        };
-        const callNow = immediate && !timeout;
-        timeout && clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-        if (callNow) func.apply(null, args);
-    }) as any) as T;
+  return (((...args: any[]) => {
+    const later = () => {
+      timeout = null;
+      if (!immediate) func.apply(null, args);
+    };
+    const callNow = immediate && !timeout;
+    timeout && clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(null, args);
+  }) as any) as T;
 }

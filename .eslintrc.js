@@ -20,6 +20,8 @@ module.exports =  {
     // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
     "@typescript-eslint/explicit-function-return-type": "off",
     "react/prop-types": 'off',
+    "indent": "off",
+    "@typescript-eslint/indent": ["warn", 2],
 
     // react-hooks
     "react-hooks/rules-of-hooks": "error",
