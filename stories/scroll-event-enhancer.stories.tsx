@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { useDOMScrollEventWatcher, useUserScrollTriggerEventWatcher, useLastFreeScrollSnapAnimation } from '../';
+import { useLastFreeScrollSnapAnimation } from '../';
 import { storiesOf } from '@storybook/react';
 import { number, button } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
@@ -12,7 +12,7 @@ const DEFAULT_WHEEL_DEBOUNCE_TIME_MS = 500;
 // prevent duplicated call log (call log only when props are changed)
 const Log: React.FC<{ name?: string; msg: any }> = ({ name, msg }) => {
   React.useEffect(() => {
-    action(`${name}`)(msg);
+    action(`${name}`)(JSON.stringify(msg, null, 2));
   }, [name, msg]);
   return null;
 };
@@ -28,7 +28,7 @@ storiesOf('scroll snap', module)
     const ScrollAnimationEventWatcher: React.FC<{
       wheelEndDebounceTime: number;
     }> = ({ wheelEndDebounceTime }) => {
-      const { animationEvent, animateScroll } = useLastFreeScrollSnapAnimation({
+      const { animationEvent, animateScroll, animationStatus } = useLastFreeScrollSnapAnimation({
         scrollContainerElement: document,
         animationDurationMs: scrollAnimationDuration,
         snapPointList,
@@ -53,7 +53,12 @@ storiesOf('scroll snap', module)
         },
       };
 
-      return <>{<FixedController callbackTable={controllerTable} />}</>;
+      return (
+        <>
+          <Log name="animation" msg={animationStatus} />
+          {<FixedController callbackTable={controllerTable} />}
+        </>
+      );
     };
 
     return (

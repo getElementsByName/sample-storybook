@@ -17,7 +17,7 @@ const FixedController: React.FC<PropsType> = ({ callbackTable }) => {
       </div>,
     );
   }
-  return <div style={{ position: 'fixed', right: 0 }}>{buttonElementList}</div>;
+  return <div style={{ position: 'fixed', right: 0, top: 0 }}>{buttonElementList}</div>;
 };
 
 export { FixedController };

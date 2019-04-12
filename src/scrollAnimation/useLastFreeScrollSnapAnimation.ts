@@ -21,6 +21,7 @@ function useLastFreeScrollSnapAnimation({
 }: ArgumentType) {
   const START_AREA_ACCEPT_OFFSET = 10;
 
+  const [animationTargetPosition, setAnimationStateForReturn] = React.useState<{ y: number } | null>(null);
   const cancelCallbackRef = React.useRef<Function | null>(null);
   const allCancelCallbackRef = React.useRef<Function>(() => {
     cancelCallbackRef.current !== null && cancelCallbackRef.current();
@@ -43,6 +44,7 @@ function useLastFreeScrollSnapAnimation({
   const animationEndCallbackRef = React.useRef<Function>(() => {
     scrollAnimationEndTrigger();
     cancelCallbackRef.current = null;
+    setAnimationStateForReturn(null);
   });
 
   const animateScrollRef = React.useRef(({ y }: { y: number }) => {
@@ -59,6 +61,7 @@ function useLastFreeScrollSnapAnimation({
     });
 
     cancelCallbackRef.current = cancel;
+    setAnimationStateForReturn({ y: y });
   });
 
   const animationEventName = event && event.eventName;
@@ -95,6 +98,7 @@ function useLastFreeScrollSnapAnimation({
 
   return {
     animationEvent: event,
+    animationStatus: animationTargetPosition,
     animateScroll: animateScrollRef.current,
   };
 }
