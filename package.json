@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "test": "jest --config ./jest.config.js"
   },
   "author": "getElementsByName",
   "license": "ISC",
