@@ -108,7 +108,7 @@ storiesOf('basic', module)
       });
 
       React.useEffect(() => {
-        log(userScrollTriggerEvent.eventName, userScrollTriggerEvent);
+        log(userScrollTriggerEvent.event.eventName, userScrollTriggerEvent);
       }, [userScrollTriggerEvent]);
       return null;
     };

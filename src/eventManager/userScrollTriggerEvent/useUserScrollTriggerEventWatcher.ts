@@ -9,6 +9,11 @@ interface ArgumentsType {
   wheelEndDebounceTime?: number;
 }
 
+interface UserScrollTriggerEvent {
+  event: EventWithPhase<WheelTouchEventType | null>;
+  type: 'wheel' | 'touch';
+}
+
 const useUserScrollTriggerEventWatcher = ({ scrollContainerElement, wheelEndDebounceTime = 1000 }: ArgumentsType) => {
   const touchEvent = useTouchEventEnhancer({
     element: scrollContainerElement,
@@ -19,14 +24,20 @@ const useUserScrollTriggerEventWatcher = ({ scrollContainerElement, wheelEndDebo
     element: scrollContainerElement,
   });
 
-  const [lastEvent, setLastEvent] = React.useState<EventWithPhase<WheelTouchEventType | null>>(wheelEvent);
+  const [lastEvent, setLastEvent] = React.useState<UserScrollTriggerEvent>({ event: wheelEvent, type: 'wheel' });
 
   React.useEffect(() => {
-    setLastEvent(touchEvent);
+    setLastEvent({
+      event: touchEvent,
+      type: 'touch',
+    });
   }, [touchEvent]);
 
   React.useEffect(() => {
-    setLastEvent(wheelEvent);
+    setLastEvent({
+      event: wheelEvent,
+      type: 'wheel',
+    });
   }, [wheelEvent]);
 
   return lastEvent;

@@ -24,8 +24,6 @@ function getLastFreeScrollSnapAnimationInfo({
     areaPointList: snapPointList,
   });
 
-  // 특정 속도 이상 (도착지 예상하여 넘을 거 같으면) 바로 경계로 붙이기
-
   let nextIndex: number | null = endIndex;
   const lastIndex = snapPointList.length - 1;
 

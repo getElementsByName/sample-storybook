@@ -12,7 +12,7 @@ interface ArgumentType {
   scrollContainerElement: ScrollListenableContainerElementType;
 }
 
-function useLastFreeScrollSnapAnimation({
+function useLastFreeScrollSnap({
   snapPointList,
   wheelEndDebounceTime,
   animationDurationMs,
@@ -97,10 +97,9 @@ function useLastFreeScrollSnapAnimation({
   ]);
 
   return {
-    animationEvent: event,
-    animationStatus: animationTargetPosition,
+    animationTargetPosition: animationTargetPosition,
     animateScroll: animateScrollRef.current,
   };
 }
 
-export { useLastFreeScrollSnapAnimation };
+export { useLastFreeScrollSnap };

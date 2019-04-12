@@ -10,6 +10,7 @@ import { getScrollPosition } from '../../util/getScrollPosition';
 
 interface ArgumentsType {
   scrollContainerElement: ScrollListenableContainerElementType;
+  wheelEndDebounceTime?: number;
 }
 
 interface PositionXY {
@@ -23,7 +24,7 @@ interface ScrollChangeEvent {
 
 type EventType = EventWithPhase<ScrollChangeEvent | null>;
 
-const useScrollChangeByUser = ({ scrollContainerElement }: ArgumentsType) => {
+const useScrollChangeByUser = ({ scrollContainerElement, wheelEndDebounceTime }: ArgumentsType) => {
   const [event, setEvent] = React.useState<EventType>({
     eventName: 'end',
     originalEvent: null,
@@ -33,6 +34,7 @@ const useScrollChangeByUser = ({ scrollContainerElement }: ArgumentsType) => {
 
   const userScrollTriggerEvent = useUserScrollTriggerEventWatcher({
     scrollContainerElement,
+    wheelEndDebounceTime,
   });
   const domScrollEvent = useDOMScrollEventWatcher({
     scrollContainerElement,
@@ -42,7 +44,11 @@ const useScrollChangeByUser = ({ scrollContainerElement }: ArgumentsType) => {
   React.useEffect(() => {
     if (domScrollEvent === null) return;
 
-    if (userScrollTriggerEvent.eventName === 'move' && domScrollEvent.eventName !== 'end') {
+    if (
+      ((userScrollTriggerEvent.type === 'wheel' && userScrollTriggerEvent.event.eventName !== 'end') ||
+        (userScrollTriggerEvent.type === 'touch' && userScrollTriggerEvent.event.eventName === 'move')) && // touch event but not scroll
+      domScrollEvent.eventName !== 'end'
+    ) {
       if (event.eventName === 'end') {
         setEvent({
           eventName: 'start',
@@ -75,7 +81,7 @@ const useScrollChangeByUser = ({ scrollContainerElement }: ArgumentsType) => {
       }
     }
 
-    if (userScrollTriggerEvent.eventName === 'end') {
+    if (userScrollTriggerEvent.event.eventName === 'end') {
       const nowPosition = getScrollPosition(scrollContainerElement);
       const startPosition = startPositionRef.current;
 
@@ -91,7 +97,13 @@ const useScrollChangeByUser = ({ scrollContainerElement }: ArgumentsType) => {
 
       startPositionRef.current = nowPosition;
     }
-  }, [event.eventName, userScrollTriggerEvent.eventName, domScrollEvent, scrollContainerElement, event.originalEvent]);
+  }, [
+    event.eventName,
+    userScrollTriggerEvent.event.eventName,
+    domScrollEvent,
+    scrollContainerElement,
+    event.originalEvent,
+  ]);
 
   return event;
 };

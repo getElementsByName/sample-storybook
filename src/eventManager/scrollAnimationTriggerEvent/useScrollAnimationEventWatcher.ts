@@ -4,7 +4,6 @@ import {
   useDOMScrollEventWatcher,
   ScrollListenableContainerElementType,
 } from '../domScrollEvent/useDOMScrollEventWatcher';
-import { useUserScrollTriggerEventWatcher } from '../userScrollTriggerEvent/useUserScrollTriggerEventWatcher';
 import { PositionXY, getScrollPosition } from '../../util/getScrollPosition';
 import { useScrollChangeByUser } from '../scrollChangeByUser/useScrollChangeByUser';
 
@@ -37,6 +36,7 @@ const useScrollAnimationEventWatcher = ({
 
   const scrollChangeByUserEvent = useScrollChangeByUser({
     scrollContainerElement,
+    wheelEndDebounceTime,
   });
 
   const domScrollEvent = useDOMScrollEventWatcher({

@@ -10,4 +10,4 @@ export * from './util/useDOMEventHandler';
 export * from './util/getScrollPosition';
 export * from './util/findArea';
 
-export * from './scrollAnimation/useLastFreeScrollSnapAnimation';
+export * from './scrollAnimation/useLastFreeScrollSnap';

@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { useLastFreeScrollSnapAnimation } from '../';
+import { useLastFreeScrollSnap } from '../';
 import { storiesOf } from '@storybook/react';
 import { number, button } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
@@ -28,7 +28,7 @@ storiesOf('scroll snap', module)
     const ScrollAnimationEventWatcher: React.FC<{
       wheelEndDebounceTime: number;
     }> = ({ wheelEndDebounceTime }) => {
-      const { animationEvent, animateScroll, animationStatus } = useLastFreeScrollSnapAnimation({
+      const { animateScroll, animationTargetPosition } = useLastFreeScrollSnap({
         scrollContainerElement: document,
         animationDurationMs: scrollAnimationDuration,
         snapPointList,
@@ -55,7 +55,7 @@ storiesOf('scroll snap', module)
 
       return (
         <>
-          <Log name="animation" msg={animationStatus} />
+          <Log name="animation" msg={animationTargetPosition} />
           {<FixedController callbackTable={controllerTable} />}
         </>
       );
